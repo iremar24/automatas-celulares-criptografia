@@ -1,6 +1,6 @@
 # Autómatas Celulares en la Criptografía
 
-En mi Trabajo de Fin de Grado , quiero implementar distintos algoritmos para encriptar tanto texto como imágenes usando autómatas celulares .
+En mi Trabajo de Fin de Grado , quiero implementar distintos algoritmos para encriptar tanto texto como imágenes usando autómatas celulares.
 
 
 ## Encriptación de texto
@@ -14,8 +14,8 @@ Donde $\oplus$ representa la operación XOR y $\lor$ la operación OR.
 ### Metodología de Encriptación
 Se parte de una secuencia inicial formada por 0 y un solo 1 en el centro. 
 1. Se genera una secuencia binaria a partir de la Regla 30.
-2. Se convierte la palabra introducida por el usuario a binario (ASCII).
-3. Se aplica una operación **XOR** entre el mensaje y la secuencia generada para obtener el criptograma.
+2. Se convierte la palabra introducida por el usuario a binario según el código (ASCII).
+3. Se aplica una operación **XOR** entre el mensaje dado pasado a binario y la secuencia generada por la Regla 30, y se vuelve a pasar a palabra, para obtener la nueva palabra encriptada.
 
 ### Cómo usar el proyecto
 1. Asegúrate de tener instalado Python.
@@ -24,7 +24,7 @@ Se parte de una secuencia inicial formada por 0 y un solo 1 en el centro.
 
 ### Tecnologías utilizadas
 - **Lenguaje:** Python 
-- **Entorno:** Spyder IDE
+- **Entorno:** Spyder
 - **Control de versiones:** Git y GitHub
 
 ## Encriptación de imágenes
