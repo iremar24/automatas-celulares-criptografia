@@ -145,7 +145,9 @@ def regla_30(it:int)->str:
 def encripta(pal: str, it: int) -> str:
     """
     in: pal es un str , que será la palabra/frase que queramos encriptar
-        it es un entero que será el número de iteraciones que usaremos
+        it es un entero que será el número de iteraciones que usaremos.
+        Tenemos que asegurarnos que el numero de it sea lo suficientemente grande 
+        para cubrir la longitud de la palabra/ frase que queramos encriptar
         
     out: Devolverá la palabra encriptada en forma de str
 
