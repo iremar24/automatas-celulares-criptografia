@@ -17,12 +17,6 @@ Se parte de una secuencia inicial formada por 0 y un solo 1 en el centro.
 2. Se convierte la palabra introducida por el usuario a binario según el código (ASCII).
 3. Se aplica una operación **XOR** entre el mensaje dado pasado a binario y la secuencia generada por la Regla 30, y se vuelve a pasar a palabra, para obtener la nueva palabra encriptada.
 
-
-### Tecnologías utilizadas
-- **Lenguaje:** Python 
-- **Entorno:** Spyder
-- **Control de versiones:** Git y GitHub
-
 ## Encriptación de imágenes
 Este proyecto busca encriptar imágenes , usando algoritmos basados en el siguiente artículo:
 
@@ -37,7 +31,13 @@ Se parte de una imagen inicial, que se convierte en una matriz y sus valores se 
 1. Asegúrate de tener instalado Python.
 2. Abre el archivo principal en Spyder.
 3. En el caso de encriptar textos:
-     Ejecutar el script e introducir la palabra/text que se desee encriptar,seguido de el número de iteraciones (este número tiene que ser suficientemente grande       para poder cubrir el texto/palabra completo). EJ: encripta('hola',100) o des
+     Ejecutar el script regla30.py e introducir la palabra/text que se desee encriptar,seguido de el número de iteraciones (este número tiene que ser                   suficientemente grande para poder cubrir el texto/palabra completo). EJ: encripta('hola',100) o desEncripta('hgäa',100) si se quiere desencriptar.
 4. En el caso de las imágenes:
-     Se debe ejecutar el script e introducir el nombre de la imágen que se desee encriptar. Esta tiene que estar en la misma ubicación que el programa. Ej:             Fase1y2("beach.jpg").
-5. Para
+     Se debe ejecutar el script regla30.py e introducir el nombre de la imágen que se desee encriptar. Esta tiene que estar en la misma ubicación que el programa.      Ej: Fase1y2("beach.jpg").
+5. Para poder desencriptar, ejecutar el archivo imagenes.py y ejecutar Fase1y2_2("img.png"), guardar el resultado y a continuación, hacer                             desEncripta_img("resultado.png").
+
+
+### Tecnologías utilizadas
+- **Lenguaje:** Python 
+- **Entorno:** Spyder
+- **Control de versiones:** Git y GitHub
