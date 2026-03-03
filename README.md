@@ -28,3 +28,8 @@ Se parte de una secuencia inicial formada por 0 y un solo 1 en el centro.
 - **Control de versiones:** Git y GitHub
 
 ## Encriptación de imágenes
+Este proyecto busca encriptar imágenes , usando algoritmos basados en el siguiente artículo:
+
+* **Título del artículo:** "A novel image encryption algorithm using chaos and reversible cellular automata"
+* **Autores:** Xingyuan Wang, Dapeng Luan
+* **Enlace:** [Haz clic aquí para leer el artículo](https://www.sciencedirect.com/science/article/abs/pii/S1007570413001524?fr=RR-1&ref=cra_js_challenge)
