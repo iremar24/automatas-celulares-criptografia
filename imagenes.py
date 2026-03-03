@@ -1,23 +1,19 @@
 # -*- coding: utf-8 -*-
 """
-Created on Mon Dec  1 18:14:05 2025
-
-TFG
+Created on Tue Feb  3 19:54:28 2026
 
 @author: Irene
 """
 
- # cuidado con caracteres españoles y tildes y cosas q son dos bytes
-# cifrar y descifrar a.encode() y a.decode()
-# buscar diferencias en este caso o como siempre con clave privada 
+#EN ESTE CÓDIGO SE ALTERA UN POCO EL MÉTODO, EN LA PARTE DE TABLA1
+#YA QUE SE FORMA LA MATRIZ UNIDOS UNIENDO LAS DOS ULTIMAS ITERACIONE
+# DE S, St+1 y St COMO LOS ALTOS Y LOS BAJOS PARA PODER RECUPERAR AL 
+#MENOS UNA PARTE DE LA IMAGEN ORIGINAL E INTENTAR DESENCRIPTAR 
 
 import numpy as np
 from PIL import Image
 from math import sin 
 
-# ==================================================================================
-# SECCIÓN 1. ENCRIPTACIÓN DE MENSAJES
-# ==================================================================================
 
 def bin_8(n:int)->str:
     """
@@ -87,26 +83,6 @@ def bin_a_str(n:str)->str:
     
 
 
-def pal_a_bin(pal:str)->str: 
-    """
-    in: pal es una palabra en str
-        
-    out: Devolverá el número binario asociado a cada letra según el código ASCII 
-
-    Example
-    ------
-    >>> pal_a_bin("HOLA")
-    '01001000010011110100110001000001'
-    
-    """
-    result=""
-    for elem in pal:
-        n=ord(elem)
-        binario=bin_8(n)
-        result+=binario
-    return result
-
-
 def suma_k(pal:str,k:str)->str:
     """
     in: pal y k son dos numeros binarios en string
@@ -129,101 +105,12 @@ def suma_k(pal:str,k:str)->str:
     return result
 
 
-def regla_30(it:int)->str:
-    """
-    in: it es un entero que indica el número de iteraciones que se repetirá el proceso 
-        
-    out: Devolverá un número binario en string resultante de aplicarle it veces el algoritmo
-
-    Consideramos configuración circular, cuando estamos en los extremos se tiene que 
-      el vecino izq del primer elemento es el último elemento y el vecino derecho del
-      último es el primero
-      
-    Example
-    ------
-    >>>regla_30(20)
-    '00000000000010001000100000001000100010000000100010001000000000000'
-    
-    """
-    #configuración inicial
-    r0=[0]*12+[1]+[0]*12
-    r1=r0.copy()
-    for j in range(it):
-        m=len(r0)
-        for i in range(m):
-            if i==m-1: #si estamos en la ultima pos, consideramos su vecina dcha como la primera
-                nueva_dcha=(r0[i-1]+r0[i]+r0[0])%2
-            #cuando estamos en la primera, consideramos la vecina izq como el ultimo elemento 
-            elif i==0:
-                nueva_izda=r1[i]=(r0[-1]+r0[i]+r0[i+1]**2)%2
-            else:
-                r1[i]=(r0[i-1]+r0[i]+r0[i+1]**2)%2
-        r1=[nueva_izda]+r1
-        r1.append(nueva_dcha)
-        r0=r1.copy()   
-        #para que devuelva un str
-        resultado=""
-        for elem in r0:
-            resultado+=str(elem)
-            
-    return resultado
-
-def encripta(pal: str, it: int) -> str:
-    """
-    in: pal es un str , que será la palabra/frase que queramos encriptar
-        it es un entero que será el número de iteraciones que usaremos.
-        Tenemos que asegurarnos que el numero de it sea lo suficientemente grande 
-        para cubrir la longitud de la palabra/ frase que queramos encriptar
-        
-    out: Devolverá la palabra encriptada en forma de str
-
-    Example
-    ------
-    >>> encripta('adiós muy buenas',230)
-    'anKss*Oõy buedCó'
-    
-    >>> encripta("Hola buenas, Soy María y me gustaría decirte un par de cosas, en Primer lugar soy ESPAÑOLA, no hay duda de eso",1000)
-     'Hgdi j}mnas, [gq Eizía y em(g}{|aría lmkiz|m un piz(dm(kosas,(mf Xzamer l}oir({gy ESPIÙGLI$(no haq(luli(de esg'
-   
-    """
-    k=regla_30(it)
-    palbin=pal_a_bin(pal)
-    m=len(palbin)
-    k=k[:m]
-    suma=suma_k(palbin,k)
-    letras= m//8
-    resultado=""
-    for i in range(letras):
-        ind_0=8*i
-        ind_f=8*(i+1)
-        pal_trad=suma[ind_0:ind_f]
-        traduc=bin_a_str(str(pal_trad))
-        resultado+=traduc
-    return resultado
-
-def desEncripta(pal:str,it:int)->str:
-    """
-    in: pal es un str , que será la palabra/frase que queramos desencriptar
-        it es un entero que será el número de iteraciones que usaremos
-        
-    out: Devolverá la palabra desencriptada en forma de str
-
-    Example
-    ------
-    >>> desEncripta('anKss*Oõy buedCó',230)
-    'adiós muy buenas'
-    
-    >>> desEncripta('Hgdi j}mnas, [gq Eizía y em(g}{|aría lmkiz|m un piz(dm(kosas,(mf Xzamer l}oir({gy ESPIÙGLI$(no haq(luli(de esg',1000)
-     'Hola buenas, Soy María y me gustaría decirte un par de cosas, en Primer lugar soy ESPAÑOLA, no hay duda de eso'
-    """
-    result=encripta(pal,it)
-    return result
 
 
 
 
 # ==================================================================================
-# SECCIÓN 2. ENCRIPTACIÓN DE IMÁGENES
+# SECCIÓN 2. ENCRIPTACIÓN DE IMÁGENES 
 # ==================================================================================
 
 
@@ -403,6 +290,19 @@ def separa2(matriz:list)->list:
          nueva_matriz.append(nueva_fila)
      return nueva_matriz
  
+def junta2(matriz:list)->list:
+    m=len(matriz)
+    n=len(matriz[0])
+    nueva_matriz=[]
+    for i in range(m):
+        nueva_fila=[]
+        for j in range(0,n,2):
+            elem=matriz[i][j]
+            elem2=matriz[i][j+1]
+            nueva_fila.append(elem+elem2)
+        nueva_matriz.append(nueva_fila)
+    return nueva_matriz
+ 
 #Para este paso es necesario haber pactado los valores
 #iniciales con el receptor, con x0,y0,z0 pertenecientes a (0,1)
 
@@ -526,6 +426,8 @@ def bitsAltos(matriz:list)->list:
     return matrizAlta
 
 
+
+
 def bitsBajos(matriz:list)->list:
     """
     
@@ -573,14 +475,15 @@ def tabla1(matriz:list,tiempo:int,Sini:list):
                 
     #Como la tabla 1 guarda segun la combinacion un posible valor segun Sij^(t-1) valga 0 o 1
                 ind=0
-                if St_vieja[i][j]==0:
+                if int(St_vieja[i][j])==0:
                     ind=0
-                elif St_vieja[i][j]==1:
+                elif int(St_vieja[i][j])==1:
                     ind=1
                 fila_nueva.append(tabla[pos][ind])
             St_nueva.append(fila_nueva)
         S.append(St_nueva)
-    return S[-1]
+    #Para poder descifrar después vamos a guardar ambos
+    return S[-1],S[-2]
 
 
 
@@ -605,7 +508,7 @@ def opFinal(matriz:list,z:list,Cini:int)->list:
 # -------------------------------------------------------
 
 
-def Fase1y2(img:str):
+def Fase1y2_2(img:str):
     """
     in: Dada una imagen, pasado su nombre en str
         
@@ -627,7 +530,7 @@ def Fase1y2(img:str):
     #FASE 2
     #vamos a separar la matriz permutada en los bits altos y los bajos
     mAltos=bitsAltos(m_permutada) #Mx4N
-    mBajos=bitsBajos(m_permutada) #Mx4N
+    
     #sus elems son str
     
     # Para obtener el S-1 convertiremos z_hat en matriz
@@ -636,13 +539,13 @@ def Fase1y2(img:str):
     S_menos1=DesAplana(z_hat,m_nuevo,n_nuevo)
     #Los elementos de S_menos1 son ints
     
-    S=tabla1(mAltos,6,S_menos1)
+    Saltos,Sbajos=tabla1(mAltos,6,S_menos1)
     #Los elementos de S son ints 
     
     #Ahora unimos los bits altos,siendo el valor de St claculado y los bajos
     #para ello tenemos que volver a agrupar cada 4 bits en una sola celda
-    union4Altos=une4(S)
-    union4Bajos=une4(mBajos) 
+    union4Altos=une4(Saltos)
+    union4Bajos=une4(Sbajos) 
     unidos=unionBits(union4Altos,union4Bajos)
     #queremos que en lugar de en cada celda un unico bit, tengamos los 8
     #hemos recuperado las dimensiones originales de la matriz
@@ -659,8 +562,7 @@ def Fase1y2(img:str):
     mfinal=np.array(Cint).astype(np.uint8)
     img_final=Image.fromarray(mfinal)
     return img_final
-   
-"""             
+                
                 
 # ==================================================================================
 # SECCIÓN 3. DESENCRIPTACIÓN DE IMÁGENES
@@ -703,24 +605,24 @@ def tabla1_inv(matriz:list,tiempo:int,Sf:list):
                 
     
                 ind="0"
-                if St_fut[i][j]==str(tabla[pos][0]):
+                if str(St_fut[i][j])==str(tabla[pos][0]):
                     ind="0"
-                elif St_fut[i][j]==str(tabla[pos][1]):
+                elif str(St_fut[i][j])==str(tabla[pos][1]):
                     ind="1"
-               
+                
                 fila_nueva.append(ind)
             St_nueva.append(fila_nueva)
         S.append(St_nueva)
-    return S[-3],S[-2],S[-1]
+    return S[-2],S[-1]
 
 
 def permutacion_inv(matriz:list,x_hat,y_hat)->list:
-    
+    """
     in: Dada una matriz de bin Mx2N
         
     out: Devolverá la matriz Mx2N resultante de intercambiar de posicion sus celdas
 
-
+    """
     
     m=len(matriz)
     n=len(matriz[0])
@@ -736,6 +638,8 @@ def permutacion_inv(matriz:list,x_hat,y_hat)->list:
     
     return matriz 
 
+
+
 def desEncripta_img(img:str):
     #Proceso inverso
     matrizBin=img_a_matrizBin(img)
@@ -745,49 +649,28 @@ def desEncripta_img(img:str):
    
     P=opFinal_inv(matrizBin,z,168)
     #P=unidos de antes
+    P2=separa2(P)
+    mAltos=bitsAltos(P2) #string
+    mBajos=bitsBajos(P2) #string
     
-    mAltos=bitsAltos(P)
-    mBajos=bitsBajos(P)
     
+    S0,z2=tabla1_inv(mAltos,6,mBajos) #string
     
-    S0=tabla1_inv(mAltos,6,mBajos)
+    #comprobamos que vamos bien al ser z2==z_hat
+    #SO==mAltos1 de antes
+    
     union4Altos=une4(S0)
     union4Bajos=une4(mBajos)
     unidos=unionBits(union4Altos,union4Bajos)
     
-    mp=permutacion_inv(unidos,x_hat,y_hat)
+    unidos2=separa2(unidos)
     
-    Cint=imgBin_a_Int(mp)
+    mp=permutacion_inv(unidos2,x_hat,y_hat)
+    
+    #ahora hay que juntar
+    mpJuntas=junta2(mp)
+    
+    Cint=imgBin_a_Int(mpJuntas)
     mfinal=np.array(Cint).astype(np.uint8)
     img_final=Image.fromarray(mfinal)
     return img_final
-    
-    
-    """
-    
-    
-    
-    
-    
-    
-    
-     
-        
-        
-        
-        
-   
-    
-    
-    
-
-
-            
-        
-        
-    
-    
-
-
-    
-        
