@@ -166,6 +166,12 @@ def imgBin_a_Int(matriz:list)->list:
     in : Matriz con sus elementos un bin en str
     
     out: Matriz con sus elementos el int asociado
+    
+    Example
+    --------
+    >>> imgBin_a_Int([['00111000', '00110111', '00110110'], ['00110110', '00110101', '00111000']])
+        [[56, 55, 54], [54, 53, 56]]
+        
     """
 
  
@@ -229,6 +235,9 @@ def unionBits(altos:list,bajos:list)->list:
     
     Example: 
     ----------
+    >>> unionBits([['0011', '1000'], ['0011', '1000']],[['0011', '0111'], ['0011', '0101']])
+        [['00110011', '10000111'], ['00110011', '10000101']]
+        
     """
     matriz=[]
     m=len(altos)
@@ -240,6 +249,7 @@ def unionBits(altos:list,bajos:list)->list:
         matriz.append(fila)
     return matriz
 
+
 def une4(matriz:list)->list:
     """
     
@@ -247,7 +257,11 @@ def une4(matriz:list)->list:
     
     out: Devuelve la matriz MxN
     
-
+    Example:
+    ----------
+    >>> une4([['0', '0', '1', '1', '0', '1', '1', '1'],['0', '0', '1', '1', '0', '1', '0', '1']])
+        [['0011', '0111'], ['0011', '0101']]
+        
     """        
     m=len(matriz)
     n=len(matriz[0])
@@ -275,7 +289,7 @@ def separa2(matriz:list)->list:
 
      Example
      ------
-     >>> separa2(m=[['00111001','00111000',],['00110101','00111000']]) 
+     >>> separa2([['00111001','00111000',],['00110101','00111000']]) 
        [['0011', '1001', '0011', '1000'], ['0011', '0101', '0011', '1000']]
      """
      m=len(matriz)
@@ -291,6 +305,18 @@ def separa2(matriz:list)->list:
      return nueva_matriz
  
 def junta2(matriz:list)->list:
+    """
+    
+    in: Matriz de string Mx2N
+    
+    out : Matriz de string MxN donde se han unido cada par de elementos
+    
+    Example:
+    ----------
+    >>> junta2([['0011', '1001', '0011', '1000'], ['0011', '0101', '0011', '1000']])
+        [['00111001', '00111000'], ['00110101', '00111000']]
+         
+    """
     m=len(matriz)
     n=len(matriz[0])
     nueva_matriz=[]
@@ -310,9 +336,20 @@ def junta2(matriz:list)->list:
 
 def x_y_z(matriz:list)->list:
     """
-    in: Dada una matriz de bin Mx2N
+    in: Dada una matriz de bin 
         
-    out: Devolverá los valores x, y, z
+    out: Devolverá los valores x, y, z asociados al mapa caótico
+    
+    Example:
+    ----------
+    x_y_z([['00111000', '00110111'], ['00110110', '00111000']])
+     
+    ([0.29999999999999893, 0.95511034471805, 0.4589528513769614, 0.9654747230881349,
+     0.726253173680864, 0.38287769637623903, 0.5636860010224893, 0.7190836419857214],
+     [0.04059633027523013, 0.5572511324639962, 0.03532236870436378, 0.5145209133675017,
+      0.9929158802135127, 0.6869704321108756, 0.11364880471931116, 0.5638859190396097],
+     [0.44188213370884455, 0.1269141527519082, 0.9478104122549009, 0.7803213978473096,
+      0.9091245400766681, 0.9886267010853445, 0.07859908416606487, 0.4028641393942234])
 
     """
     
@@ -350,10 +387,14 @@ def x_y_z(matriz:list)->list:
 
 def f_hats(x:list,y:list,z:list,m:int,n:int)->list:
       """
-      in: Dados x,y,z
+      in: Dados x,y,z y las dimensiones m,n 
           
-      out: Devolverá los x_gorro,y_gorro y z_gorro
+      out: Devolverá los x_gorro,y_gorro y z_gorro discretizando las secuencias del mapa caótico
 
+      Example:
+      ----------
+      >>> f_hats(x,y,z,2,2) (siendo los x,y,z del resultado anterior)
+          ([1, 0, 1, 1], [0, 1, 1, 1], [0, 1, 1, 1, 0, 1, 0, 0])
       """
       
       # si hacemos range(m*2*n + 100) x=x[101:]
@@ -376,8 +417,13 @@ def permutacion(matriz:list,x_hat,y_hat)->list:
     """
     in: Dada una matriz de bin Mx2N
         
-    out: Devolverá la matriz Mx2N resultante de intercambiar de posicion sus celdas
-
+    out: Devolverá la matriz Mx2N resultante de intercambiar de posición sus celdas
+    
+    Example:
+    ----------
+    >>> permutacion([['1010', '1100'], ['0011', '0101']],[1,1,0,0],[1,0,0,1])
+        [['1100', '1010'], ['0101', '0011']]
+   
     """
     
     m=len(matriz)
@@ -405,14 +451,17 @@ tabla=[[1,0]]*4+[[0,1]]*2+[[1,0]]*2+[[0,1]]*4+[[1,0]]*4+[[0,1]]*6+[[1,0]]*2+[[0,
 def bitsAltos(matriz:list)->list:
     """
     
-    in: Dada una matriz en forma de lista
+    in: Dada una matriz en forma de lista 
     
-    out: Devuelve la matriz formada por las columnas pares
+    out: Devuelve la matriz formada por las columnas pares, separando cada elem en una columna 
     
+    Se llama así ya que en nuestro algoritmo se aplica a una matriz Mx2N donde cada columna son los bits
+        altos - bajos alternamente. Al quedarnos solo con los pares nos quedamos con los bits Altos
+   
     Example
     --------
-    >>> bitsAltos([[(1,0),(0,1),(10,0),(0,20),(11,1),(12,1)],[(21,2),(22,2),(3,1),(1,3),(4,5),(6,7)]])
-        [[1, 0, 10, 0, 11, 1], [21, 2, 3, 1, 4, 5]]
+    >>> bitsAltos([['0011', '0110', '0011', '0111'], ['0011', '1000', '0011', '1000']])
+        [['0', '0', '1', '1', '0', '0', '1', '1'], ['0', '0', '1', '1', '0', '0', '1', '1']]
    
     """
     matrizAlta=[]
@@ -437,8 +486,8 @@ def bitsBajos(matriz:list)->list:
     
     Example
     --------
-    >>> bitsBajos([[(1,0),(0,1),(10,0),(0,20),(11,1),(12,1)],[(21,2),(22,2),(3,1),(1,3),(4,5),(6,7)]])
-        [[0, 1, 0, 20, 12, 1], [22, 2, 1, 3, 6, 7]]
+    >>> bitsBajos([['0011', '0110', '0011', '0111'], ['0011', '1000', '0011', '1000']])
+        [['0', '1', '1', '0', '0', '1', '1', '1'], ['1', '0', '0', '0', '1', '0', '0', '0']]
    
     """
     matrizBaja=[]
@@ -453,6 +502,21 @@ def bitsBajos(matriz:list)->list:
 
         
 def tabla1(matriz:list,tiempo:int,Sini:list):
+    """
+    
+    in: matriz, tiempo t y un estado inicial Sini con las mismas dimensiones que la matriz
+        Ambas matrices de enteros 0 o 1
+    
+    out: Estado St+1, St resultados tras aplicar t veces la tabla 1 con las reglas locales de nuestro 
+        Autómata Celular Reversible
+    
+    Example:
+    ----------
+    >>>tabla1([[1,0,1,0, 1,1,0,0], [0,0,1,1, 0,1,0,1]],5,[[1,1,0,0, 1,0,1,0], [0,1,0,1, 0,0,1,1]])
+        ([[1, 0, 1, 1, 1, 0, 1, 1], [1, 0, 0, 1, 1, 0, 1, 0]],
+         [[1, 1, 1, 0, 1, 1, 1, 0], [1, 0, 0, 1, 0, 1, 0, 0]])
+    """
+    
     #la sini sera z_grro
     S=[Sini,matriz]
     m=len(matriz)
@@ -473,7 +537,7 @@ def tabla1(matriz:list,tiempo:int,Sini:list):
                 #pasamos el num a binario para acceder a su valor en la tabla
                 pos=bin_a_num(binario)
                 
-    #Como la tabla 1 guarda segun la combinacion un posible valor segun Sij^(t-1) valga 0 o 1
+    #Como la tabla 1 guarda segun la combinación de un posible valor segun Sij^(t-1) valga 0 o 1
                 ind=0
                 if int(St_vieja[i][j])==0:
                     ind=0
@@ -491,6 +555,20 @@ def tabla1(matriz:list,tiempo:int,Sini:list):
             
 
 def opFinal(matriz:list,z:list,Cini:int)->list:
+    """
+    in: matriz de bin en str, z lista de len(m)*len(m[0])*len(m[0][0]), Cini entero dado
+   
+    out: una matriz m*n 
+    
+    Example:
+    -----------
+    matriz=[['00110110', '00110111'], ['00111000', '00111000']]
+    z=[0.44188213370884455,0.1269141527519082 , ... , 
+      0.6061470652329817, 0.4525983619717273]
+    >>> opFinal(matriz,z,168)
+        [['10011110', '01110110'], ['11111011', '10101010']]
+    
+    """
     m=len(matriz)
     n=len(matriz[0])
     matriz1D=aplanaMatriz(matriz)
@@ -569,6 +647,23 @@ def Fase1y2_2(img:str):
 # ==================================================================================
         
 def opFinal_inv(matriz:list,z:list,Cini:int)->list:
+    """
+        La inversa de OpFinal anterior
+    
+    in: matriz de bin en str, z lista de len(m)*len(m[0])*len(m[0][0]), Cini entero dado
+   
+    out: una matriz m*n 
+    
+    Example:
+    -----------
+    matriz=[['10011110', '01110110'], ['11111011', '10101010']]
+    z=[0.44188213370884455,0.1269141527519082 , ... , 
+      0.6061470652329817, 0.4525983619717273]
+    >>> opFinal_inv(matriz,z,168)
+        [['00110110', '00110111'], ['00111000', '00111000']]
+    
+    
+    """
     m=len(matriz)
     n=len(matriz[0])
     matriz1D=aplanaMatriz(matriz)
@@ -582,6 +677,24 @@ def opFinal_inv(matriz:list,z:list,Cini:int)->list:
     return DesAplana(P,m,n)
 
 def tabla1_inv(matriz:list,tiempo:int,Sf:list):
+    """
+        La inversa de antes : ESTA DEVUELVE STR
+        
+    in: matriz, tiempo t y un estado final Sf con las mismas dimensiones que la matriz
+        Ambas matrices de enteros 0 o 1
+    
+    out: Estado St+1, St resultados tras aplicar t veces la tabla 1 con las reglas locales de nuestro 
+        Autómata Celular Reversible
+    
+    Example:
+    ----------
+    >>>tabla1([[1, 0, 1, 1, 1, 0, 1, 1], [1, 0, 0, 1, 1, 0, 1, 0]],5 ,[[1, 1, 1, 0, 1, 1, 1, 0], [1, 0, 0, 1, 0, 1, 0, 0]])
+        ([['1', '0', '1', '0', '1', '1', '0', '0'],
+          ['0', '0', '1', '1', '0', '1', '0', '1']],
+         [['1', '1', '0', '0', '1', '0', '1', '0'],
+          ['0', '1', '0', '1', '0', '0', '1', '1']])
+    
+    """
     #la sf sera los bits bajos
     m=len(matriz)
     n=len(matriz[0])
@@ -618,10 +731,16 @@ def tabla1_inv(matriz:list,tiempo:int,Sf:list):
 
 def permutacion_inv(matriz:list,x_hat,y_hat)->list:
     """
+        La permutacion inversa (ceo que esta funcion no hace falta pues la propia permutación es su propia inversa)
     in: Dada una matriz de bin Mx2N
         
     out: Devolverá la matriz Mx2N resultante de intercambiar de posicion sus celdas
 
+    Example:
+    ----------
+    >> permutacion_inv([['1100', '1010'], ['0101', '0011']],[1,1,0,0],[1,0,0,1])
+        [['1010', '1100'], ['0011', '0101']]
+   
     """
     
     m=len(matriz)
@@ -641,6 +760,12 @@ def permutacion_inv(matriz:list,x_hat,y_hat)->list:
 
 
 def desEncripta_img(img:str):
+    """
+    in : nombre de la matriz en str
+    
+    out : devuelve la imagen desencriptada
+    
+    """
     #Proceso inverso
     matrizBin=img_a_matrizBin(img)
     m2=separa2(matrizBin)

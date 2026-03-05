@@ -279,9 +279,13 @@ def imgBin_a_Int(matriz:list)->list:
     in : Matriz con sus elementos un bin en str
     
     out: Matriz con sus elementos el int asociado
-    """
-
- 
+    
+    Example
+    --------
+    >>> imgBin_a_Int([['00111000', '00110111', '00110110'], ['00110110', '00110101', '00111000']])
+        [[56, 55, 54], [54, 53, 56]]
+        
+    """ 
     m=len(matriz)
     n=len(matriz[0])
     result=[]
@@ -291,6 +295,7 @@ def imgBin_a_Int(matriz:list)->list:
             fila.append(bin_a_num(matriz[i][j]))
         result.append(fila)
     return result
+
 
 def aplanaMatriz(matriz:list)->list:
     """
@@ -342,6 +347,9 @@ def unionBits(altos:list,bajos:list)->list:
     
     Example: 
     ----------
+    >>> unionBits([['0011', '1000'], ['0011', '1000']],[['0011', '0111'], ['0011', '0101']])
+        [['00110011', '10000111'], ['00110011', '10000101']]
+      
     """
     matriz=[]
     m=len(altos)
@@ -360,6 +368,10 @@ def une4(matriz:list)->list:
     
     out: Devuelve la matriz MxN
     
+    Example:
+    ----------
+    >>> une4([['0', '0', '1', '1', '0', '1', '1', '1'],['0', '0', '1', '1', '0', '1', '0', '1']])
+        [['0011', '0111'], ['0011', '0101']]
 
     """        
     m=len(matriz)
@@ -390,6 +402,7 @@ def separa2(matriz:list)->list:
      ------
      >>> separa2(m=[['00111001','00111000',],['00110101','00111000']]) 
        [['0011', '1001', '0011', '1000'], ['0011', '0101', '0011', '1000']]
+       
      """
      m=len(matriz)
      n=len(matriz[0])
@@ -410,9 +423,20 @@ def separa2(matriz:list)->list:
 
 def x_y_z(matriz:list)->list:
     """
-    in: Dada una matriz de bin Mx2N
+    in: Dada una matriz de bin
         
-    out: Devolverá los valores x, y, z
+    out: Devolverá los valores x, y, z asociados al mapa caótico
+    
+    Example:
+    ----------
+    x_y_z([['00111000', '00110111'], ['00110110', '00111000']])
+     
+    ([0.29999999999999893, 0.95511034471805, 0.4589528513769614, 0.9654747230881349,
+     0.726253173680864, 0.38287769637623903, 0.5636860010224893, 0.7190836419857214],
+     [0.04059633027523013, 0.5572511324639962, 0.03532236870436378, 0.5145209133675017,
+      0.9929158802135127, 0.6869704321108756, 0.11364880471931116, 0.5638859190396097],
+     [0.44188213370884455, 0.1269141527519082, 0.9478104122549009, 0.7803213978473096,
+      0.9091245400766681, 0.9886267010853445, 0.07859908416606487, 0.4028641393942234])
 
     """
     
@@ -449,37 +473,45 @@ def x_y_z(matriz:list)->list:
     return x[1:],y[1:],z[1:]
 
 def f_hats(x:list,y:list,z:list,m:int,n:int)->list:
-      """
-      in: Dados x,y,z
-          
-      out: Devolverá los x_gorro,y_gorro y z_gorro
+     """
+     in: Dados x,y,z y las dimensiones m,n 
+         
+     out: Devolverá los x_gorro,y_gorro y z_gorro discretizando las secuencias del mapa caótico
 
-      """
+     Example:
+     ----------
+     >>> f_hats(x,y,z,2,2) (siendo los x,y,z del resultado anterior)
+         ([1, 0, 1, 1], [0, 1, 1, 1], [0, 1, 1, 1, 0, 1, 0, 0])
+     """
       
-      # si hacemos range(m*2*n + 100) x=x[101:]
-      #y=y[101:]
-      #z=z[101:]
-      x_hat=[]
-      y_hat=[]
-      z_hat=[]
+     # si hacemos range(m*2*n + 100) x=x[101:]
+     #y=y[101:]
+     #z=z[101:]
+     x_hat=[]
+     y_hat=[]
+     z_hat=[]
       
-      for k in range(m*n):
+     for k in range(m*n):
          x_hat.append(int((x[k]*10**13)%m))
          y_hat.append(int((y[k]*10**13)%(n)))
-      for k in range(m*2*n):
+     for k in range(m*2*n):
          z_hat.append(int((z[k]*10**13)%2))
          #de longitud Mx4N
         
-      return x_hat,y_hat,z_hat  
+     return x_hat,y_hat,z_hat  
 
 def permutacion(matriz:list,x_hat,y_hat)->list:
     """
     in: Dada una matriz de bin Mx2N
         
-    out: Devolverá la matriz Mx2N resultante de intercambiar de posicion sus celdas
-
-    """
+    out: Devolverá la matriz Mx2N resultante de intercambiar de posición sus celdas
     
+    Example:
+    ----------
+    >>> permutacion([['1010', '1100'], ['0011', '0101']],[1,1,0,0],[1,0,0,1])
+        [['1100', '1010'], ['0101', '0011']]
+   
+    """
     m=len(matriz)
     n=len(matriz[0])
     ind_caos=0
@@ -505,14 +537,17 @@ tabla=[[1,0]]*4+[[0,1]]*2+[[1,0]]*2+[[0,1]]*4+[[1,0]]*4+[[0,1]]*6+[[1,0]]*2+[[0,
 def bitsAltos(matriz:list)->list:
     """
     
-    in: Dada una matriz en forma de lista
+    in: Dada una matriz en forma de lista 
     
-    out: Devuelve la matriz formada por las columnas pares
+    out: Devuelve la matriz formada por las columnas pares, separando cada elem en una columna 
     
+    Se llama así ya que en nuestro algoritmo se aplica a una matriz Mx2N donde cada columna son los bits
+        altos - bajos alternamente. Al quedarnos solo con los pares nos quedamos con los bits Altos
+   
     Example
     --------
-    >>> bitsAltos([[(1,0),(0,1),(10,0),(0,20),(11,1),(12,1)],[(21,2),(22,2),(3,1),(1,3),(4,5),(6,7)]])
-        [[1, 0, 10, 0, 11, 1], [21, 2, 3, 1, 4, 5]]
+    >>> bitsAltos([['0011', '0110', '0011', '0111'], ['0011', '1000', '0011', '1000']])
+        [['0', '0', '1', '1', '0', '0', '1', '1'], ['0', '0', '1', '1', '0', '0', '1', '1']]
    
     """
     matrizAlta=[]
@@ -535,8 +570,8 @@ def bitsBajos(matriz:list)->list:
     
     Example
     --------
-    >>> bitsBajos([[(1,0),(0,1),(10,0),(0,20),(11,1),(12,1)],[(21,2),(22,2),(3,1),(1,3),(4,5),(6,7)]])
-        [[0, 1, 0, 20, 12, 1], [22, 2, 1, 3, 6, 7]]
+    >>> bitsBajos([['0011', '0110', '0011', '0111'], ['0011', '1000', '0011', '1000']])
+        [['0', '1', '1', '0', '0', '1', '1', '1'], ['1', '0', '0', '0', '1', '0', '0', '0']]
    
     """
     matrizBaja=[]
@@ -551,6 +586,20 @@ def bitsBajos(matriz:list)->list:
 
         
 def tabla1(matriz:list,tiempo:int,Sini:list):
+    """
+    
+    in: matriz, tiempo t y un estado inicial Sini con las mismas dimensiones que la matriz
+        Ambas matrices de enteros 0 o 1
+    
+    out: Estado St+1 tras aplicar t veces la tabla 1 con las reglas locales de nuestro 
+        Autómata Celular Reversible
+    
+    Example:
+    ----------
+    >>>tabla1([[1,0,1,0, 1,1,0,0], [0,0,1,1, 0,1,0,1]],5,[[1,1,0,0, 1,0,1,0], [0,1,0,1, 0,0,1,1]])
+        ([[1, 0, 1, 1, 1, 0, 1, 1], [1, 0, 0, 1, 1, 0, 1, 0]])
+    
+    """
     #la sini sera z_grro
     S=[Sini,matriz]
     m=len(matriz)
@@ -588,6 +637,20 @@ def tabla1(matriz:list,tiempo:int,Sini:list):
             
 
 def opFinal(matriz:list,z:list,Cini:int)->list:
+    """
+    in: matriz de bin en str, z lista de len(m)*len(m[0])*len(m[0][0]), Cini entero dado
+   
+    out: una matriz m*n 
+    
+    Example:
+    -----------
+    matriz=[['00110110', '00110111'], ['00111000', '00111000']]
+    z=[0.44188213370884455,0.1269141527519082 , ... , 
+      0.6061470652329817, 0.4525983619717273]
+    >>> opFinal(matriz,z,168)
+        [['10011110', '01110110'], ['11111011', '10101010']]
+    
+    """
     m=len(matriz)
     n=len(matriz[0])
     matriz1D=aplanaMatriz(matriz)
@@ -660,134 +723,3 @@ def Fase1y2(img:str):
     img_final=Image.fromarray(mfinal)
     return img_final
    
-"""             
-                
-# ==================================================================================
-# SECCIÓN 3. DESENCRIPTACIÓN DE IMÁGENES
-# ==================================================================================
-        
-def opFinal_inv(matriz:list,z:list,Cini:int)->list:
-    m=len(matriz)
-    n=len(matriz[0])
-    matriz1D=aplanaMatriz(matriz)
-    C=[bin_8(Cini)]+matriz1D
-    P=[]
-    for i in range(n*m):
-        #usamos C[i] para usar el ultimo elem añadido
-        nuevop=suma_k(suma_k(C[i],C[i+1]),bin_8(int(z[i]*(10**13))%256))
-        P.append(nuevop)
-    
-    return DesAplana(P,m,n)
-
-def tabla1_inv(matriz:list,tiempo:int,Sf:list):
-    #la sf sera los bits bajos
-    m=len(matriz)
-    n=len(matriz[0])
-    S=[matriz,Sf]
-    for t in range(1,tiempo):
-        St_nueva=[]
-        for i in range(m):
-            fila_nueva=[]
-            for j in range(n):
-                St_fut=S[t-1]
-                St_pre=S[t]
-                
-                iz=St_pre[i][(j-1)%n]
-                arriba=St_pre[(i-1)%m][j]
-                centro=St_pre[i][j]
-                abajo=St_pre[(i+1)%m][j]
-                dcha=St_pre[i][(j+1)%n]
-                binario=str(iz)+str(arriba)+str(centro)+str(abajo)+str(dcha)
-                #pasamos el num a binario para acceder a su valor en la tabla
-                pos=bin_a_num(binario)
-                
-    
-                ind="0"
-                if St_fut[i][j]==str(tabla[pos][0]):
-                    ind="0"
-                elif St_fut[i][j]==str(tabla[pos][1]):
-                    ind="1"
-               
-                fila_nueva.append(ind)
-            St_nueva.append(fila_nueva)
-        S.append(St_nueva)
-    return S[-3],S[-2],S[-1]
-
-
-def permutacion_inv(matriz:list,x_hat,y_hat)->list:
-    
-    in: Dada una matriz de bin Mx2N
-        
-    out: Devolverá la matriz Mx2N resultante de intercambiar de posicion sus celdas
-
-
-    
-    m=len(matriz)
-    n=len(matriz[0])
-    ind_caos=m*n-1
-    for i in range(m-1,-1,-1):
-        for j in range(n-1,-1,-1):
-            nueva_i=x_hat[ind_caos]
-            nueva_j=y_hat[ind_caos]
-            elem_inicial=matriz[i][j]
-            matriz[i][j]=matriz[nueva_i][nueva_j]
-            matriz[nueva_i][nueva_j]=elem_inicial
-            ind_caos-=1
-    
-    return matriz 
-
-def desEncripta_img(img:str):
-    #Proceso inverso
-    matrizBin=img_a_matrizBin(img)
-    m2=separa2(matrizBin)
-    x,y,z=x_y_z(m2)
-    x_hat,y_hat,z_hat=f_hats(x,y,z,len(m2),len(m2[0]))
-   
-    P=opFinal_inv(matrizBin,z,168)
-    #P=unidos de antes
-    
-    mAltos=bitsAltos(P)
-    mBajos=bitsBajos(P)
-    
-    
-    S0=tabla1_inv(mAltos,6,mBajos)
-    union4Altos=une4(S0)
-    union4Bajos=une4(mBajos)
-    unidos=unionBits(union4Altos,union4Bajos)
-    
-    mp=permutacion_inv(unidos,x_hat,y_hat)
-    
-    Cint=imgBin_a_Int(mp)
-    mfinal=np.array(Cint).astype(np.uint8)
-    img_final=Image.fromarray(mfinal)
-    return img_final
-    
-    
-    """
-    
-    
-    
-    
-    
-    
-    
-     
-        
-        
-        
-        
-   
-    
-    
-    
-
-
-            
-        
-        
-    
-    
-
-
-    
-        
