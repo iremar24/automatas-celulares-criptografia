@@ -120,13 +120,6 @@ def suma_k(pal:str,k:str)->str:
   
 
 
-img=Image.open("beach.jpg").convert("L")
-  # Convertir imagen a matriz de números (array)
-matriz = np.array(img)
-
-  # Volver a convertir a objeto Pillow
-nueva_img = Image.fromarray(matriz)
-
 def img_a_matrizBin(img:str)->list:
     """
     in: Dada una imagen, pasado su nombre en str
@@ -448,7 +441,9 @@ def permutacion(matriz:list,x_hat,y_hat)->list:
 #La tabla correspondiente a la tabla1 
 tabla=[[1,0]]*4+[[0,1]]*2+[[1,0]]*2+[[0,1]]*4+[[1,0]]*4+[[0,1]]*6+[[1,0]]*2+[[0,1]]*2+[[1,0]]*2+[[0,1]]*4
 
-def bitsAltos(matriz:list)->list:
+
+
+def bitsAltos(matriz:list):
     """
     
     in: Dada una matriz en forma de lista 
@@ -469,13 +464,11 @@ def bitsAltos(matriz:list)->list:
     n=len(matriz[0])
     for i in range(m):
         fila=[]
-        for j in range(0,n,2):
-            fila+=matriz[i][j]
+        for j in range(n):
+            for k in range(4):
+                fila.append(matriz[i][j][k])
         matrizAlta.append(fila)
     return matrizAlta
-
-
-
 
 def bitsBajos(matriz:list)->list:
     """
@@ -495,10 +488,13 @@ def bitsBajos(matriz:list)->list:
     n=len(matriz[0])
     for i in range(m):
         fila=[]
-        for j in range(1,n,2):
-            fila+=(matriz[i][j])
+        for j in range(n):
+            for k in range(4,8):
+                fila.append(matriz[i][j][k])
         matrizBaja.append(fila)
     return matrizBaja
+
+
 
         
 def tabla1(matriz:list,tiempo:int,Sini:list):
@@ -586,7 +582,7 @@ def opFinal(matriz:list,z:list,Cini:int)->list:
 # -------------------------------------------------------
 
 
-def Fase1y2_2(img:str):
+def Fase1y2_20(img:str):
     """
     in: Dada una imagen, pasado su nombre en str
         
@@ -604,10 +600,11 @@ def Fase1y2_2(img:str):
     x_hat,y_hat,z_hat=f_hats(x,y,z,len(m2),len(m2[0]))
     
     m_permutada=permutacion(m2,x_hat,y_hat)
+    m_junta=junta2(m_permutada)
     
     #FASE 2
     #vamos a separar la matriz permutada en los bits altos y los bajos
-    mAltos=bitsAltos(m_permutada) #Mx4N
+    mAltos=bitsAltos(m_junta) #Mx4N
     
     #sus elems son str
     
@@ -759,7 +756,7 @@ def permutacion_inv(matriz:list,x_hat,y_hat)->list:
 
 
 
-def desEncripta_img(img:str):
+def desEncripta_img0(img:str):
     """
     in : nombre de la matriz en str
     
@@ -774,9 +771,9 @@ def desEncripta_img(img:str):
    
     P=opFinal_inv(matrizBin,z,168)
     #P=unidos de antes
-    P2=separa2(P)
-    mAltos=bitsAltos(P2) #string
-    mBajos=bitsBajos(P2) #string
+    
+    mAltos=bitsAltos(P) #string
+    mBajos=bitsBajos(P) #string
     
     
     S0,z2=tabla1_inv(mAltos,6,mBajos) #string
