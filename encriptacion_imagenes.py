@@ -11,6 +11,36 @@ from math import sin
 
 
 # ==================================================================================
+# SECCIÓN 0. VALORES INICIALES
+# ==================================================================================
+
+# -------------------------------------------------------
+#  VALORES DE LA CLAVE 
+# -------------------------------------------------------
+
+# Estos parámetros determinan la clave y tienen que ser 
+# conocidos por el emisor y el receptor 
+
+x0=0.36
+y0=0.25     # x0,y0,z0 pertenecientes a (0,1)
+z0=0.78
+
+u= 1.5      # 0<u<3.999
+ 
+k1= 35.5    #|k1|> 33.5
+k2= 38.2    #|k2|> 37.5
+k3= 36.1    #|k3|> 35.7
+
+
+# -------------------------------------------------------
+#  TABLA NECESARIA PARA FASE 2
+# -------------------------------------------------------
+
+#La tabla correspondiente a la tabla1 
+tabla=[[1,0]]*4+[[0,1]]*2+[[1,0]]*2+[[0,1]]*4+[[1,0]]*4+[[0,1]]*6+[[1,0]]*2+[[0,1]]*2+[[1,0]]*2+[[0,1]]*4
+
+
+# ==================================================================================
 # SECCIÓN 1. OPERACIONES AUXILIARES CON MATRICES
 # ==================================================================================
   
@@ -19,7 +49,7 @@ def aplanaMatriz(matriz:list)->list:
     
     in: Matriz
     
-    out: convierte la matriz en una sola lista concatenando sus fila
+    out: convierte la matriz en una sola lista concatenando sus filas
     
     Example:
     ----------
@@ -36,7 +66,7 @@ def aplanaMatriz(matriz:list)->list:
 def DesAplana(lista:list,m:int,n:int)->list:
     """
     
-    in : lista
+    in : lista, m y n enteros 
     
     out: Matriz MxN transformada de la lista 
     
@@ -84,9 +114,10 @@ def Desaplana4(lista:list,m:int,n:int)->list:
 def unionBits(altos:list,bajos:list)->list:
     """
     
-    in : Dos matrices (sus elementos entre 0 y 15)
+    in : Dos matrices
     
-    out: Unión de las dos matrices , siendo cada elemento la union de los 4 bits de la primera mas los 4 bits de la segunda
+    out: Unión de las dos matrices , siendo cada elemento la union de los 4 bits de la primera
+    como superiores mas los 4 bits de la segunda como inferiores
     
     Example: 
     ----------
@@ -111,6 +142,144 @@ def unionBits(altos:list,bajos:list)->list:
         matriz.append(fila)
     return matriz
 
+def union4BitsAltos(matriz:list)->list:
+    """
+    
+    in : matriz Mx4N con elementos int 0 o 1 
+    
+    out : matriz MxN resultante de agrupar cada 4 bits tomándolos como los 4 bits altos
+    
+    Example:
+    ----------
+    >>> union4BitsAltos([[0,1,1,0,1,0,1,1],[1,0,1,0,0,0,1,1]])
+        [[96, 176], [160, 48]]   (bin(96)=0110 0000)
+
+    """
+    m=len(matriz)
+    n=len(matriz[0])
+    nueva_matriz=[]
+    for i in range(m):
+        fila=[]
+        for j in range(0,n,4):
+            elem=matriz[i][j]<<3 | matriz[i][j+1] <<2 |matriz[i][j+2]<<1 | matriz[i][j+3]
+            fila.append(elem<<4)
+        nueva_matriz.append(fila)
+    return nueva_matriz
+
+def union4BitsBajos(matriz:list)->list:
+    """
+    
+    in : matriz Mx4N con elementos int 0 o 1 
+    
+    out : matriz MxN resultante de agrupar cada 4 bits tomándolos como los 4 bits bajos
+    
+    Example:
+    ----------
+    >>> union4BitsBajos([[0,1,1,0,1,0,1,1],[1,0,1,0,0,0,1,1]])
+        [[6, 11], [10, 3]]    (bin(6)=0000 0110)
+
+    """
+    m=len(matriz)
+    n=len(matriz[0])
+    nueva_matriz=[]
+    for i in range(m):
+        fila=[]
+        for j in range(0,n,4):
+            elem=matriz[i][j]<<3 | matriz[i][j+1] <<2 |matriz[i][j+2]<<1 | matriz[i][j+3]
+            fila.append(elem)
+        nueva_matriz.append(fila)
+    return nueva_matriz
+
+
+def bitsAltos(matriz:list)->list:
+    """
+    
+    in: Dada una matriz 
+    
+    out: Devuelve la matriz formada por los bits altos
+    
+   
+    Example
+    --------
+    >>> bitsAltos([[29,42,130],[50,2,220]])
+        [[16, 32, 128], [48, 0, 208]]
+   
+    """
+    matrizAlta=[]
+    m=len(matriz)
+    n=len(matriz[0])
+    mascaraAltos=0b11110000
+    for i in range(m):
+        fila=[]
+        for j in range(n):
+            fila.append(mascaraAltos & matriz[i][j])
+        matrizAlta.append(fila)
+    return matrizAlta
+
+
+
+
+def bitsBajos(matriz:list)->list:
+    """
+    
+    in: Dada una matriz 
+    
+    out: Devuelve la matriz formada por los bits bajos
+    
+    Example
+    --------
+    >>> bitsBajos([[29,42,130],[50,2,220]])
+        [[13, 10, 2], [2, 2, 12]]
+   
+    """
+    matrizBaja=[]
+    m=len(matriz)
+    n=len(matriz[0])
+    mascaraBajos=0b00001111
+    for i in range(m):
+        fila=[]
+        for j in range(n):
+            fila.append(mascaraBajos & matriz[i][j])
+        matrizBaja.append(fila)
+    return matrizBaja
+
+
+def separaBits(matriz:list)->list:
+    """
+    
+    in  : Dada una matriz MxN donde los elementos solo tienen la parte alta o baja de sus bits
+    
+    out : Devuelve matriz Mx4N con cada bit separado (0 ó 1)
+        
+    Example:
+    ---------
+    >>> separaBits([[13, 10, 2], [2, 2, 12]])
+        [[1, 1, 0, 1, 1, 0, 1, 0, 0, 0, 1, 0], [0, 0, 1, 0, 0, 0, 1, 0, 1, 1, 0, 0]]
+    
+    """
+    
+    nueva_matriz=[]
+    m=len(matriz)
+    n=len(matriz[0])
+    masc1=0b1000
+    masc2=0b0100
+    masc3=0b0010
+    masc4=0b0001
+    mascaras=[masc1,masc2,masc3,masc4]
+    for i in range(m):
+        fila=[]
+        for j in range(n):
+            elem=matriz[i][j]
+            if elem>15:
+                elem=elem>>4
+            for k in range(4):
+                if elem & mascaras[k]>0:
+                    fila.append(1)
+                else:
+                    fila.append(0)
+        nueva_matriz.append(fila)
+    return nueva_matriz
+    
 
 # ==================================================================================
 # SECCIÓN 2. FASE 1: CONFUSIÓN
@@ -120,7 +289,8 @@ def separa2(matriz:list)->list:
      """
      in: Dada una matriz de bin MxN
          
-     out: Devolverá la matriz Mx2N resultante de separar cada numero (8 bits) por la mitad
+     out: Devolverá la matriz Mx2N resultante de separar cada número (8 bits) por la mitad
+          cada mitad estará en una columna distinta
 
      Example
      ------
@@ -152,8 +322,8 @@ def junta2(matriz:list)->list:
     
     Example:
     ----------
-    >>> junta2([[0, 1, 7, 11], [2, 13, 112, 48], [2, 2, 8, 11]])
-        [[1, 123], [45, 1840], [34, 139]]
+    >>> junta2([[128, 11, 16, 7, 0, 12], [32, 11, 144, 15, 128, 10]])
+        [[139, 23, 12], [43, 159, 138]]
          
     """
     m=len(matriz)
@@ -173,11 +343,9 @@ def junta2(matriz:list)->list:
     return nueva_matriz
  
 #Para este paso es necesario haber pactado los valores
-#iniciales con el receptor, con x0,y0,z0 pertenecientes a (0,1)
+#iniciales con el receptor, x0,y0,z0,u,k1,k2 y k3
 
-# El parámtero u : 0 < u < 3.999
-
-def x_y_z(matriz:list)->list:
+def x_y_z(matriz:list,x0:float,y0:float,z0:float,u:float,k1:float,k2:float,k3:float)->list:
     """
     in: Dada una matriz de bin 
         
@@ -196,18 +364,6 @@ def x_y_z(matriz:list)->list:
 
     """
     
-   # x0,y0,z0 pertenecientes a (0,1)
-   #AQUI METEMOS UNA MATRIZ YA DE LA FORMA Mx2N
-    x0=0.36
-    y0=0.25
-    z0=0.78
-    
-    u= 1.500000001   # 0<u<3.999
-    
-    k1= 35.5    #|k1|> 33.5
-    k2= 38.2     #|k2|> 37.5
-    k3= 36.1    #|k3|> 35.7
-    
    # La clave sera : (x0,y0,z0,u,k1,k2,k3)
     #creamos los xn,yn,zn
     x=[x0]
@@ -216,10 +372,6 @@ def x_y_z(matriz:list)->list:
     m=len(matriz)
     n=len(matriz[0])
     #creamos el mapa caotico
-    #para garantizar caos mejor podemos hacer mas iteraciones y quedarnos con las ultimas
-    #ej si tenemos M=100x100, la sep=100x200 por tanto
-    #n=20000 , podemos hacer 21000 y eliminar los 1000 primeros
-    #Asi podemos evitar que se rastreen las semillas originales
     for l in range(m*n*2): 
         x.append((u*k1*y[l]*(1-x[l])+z[l])%1)
         y.append((u*k2*y[l]+z[l]*1/(1+(x[l+1])**2))% 1)
@@ -227,6 +379,8 @@ def x_y_z(matriz:list)->list:
         
     #vamos desde el uno para no usar los valores x0,y0,z0
     return x[1:],y[1:],z[1:]
+
+
 
 def f_hats(x:list,y:list,z:list,m:int,n:int)->list:
       """
@@ -239,30 +393,26 @@ def f_hats(x:list,y:list,z:list,m:int,n:int)->list:
       >>> f_hats(x,y,z,2,2) (siendo los x,y,z del resultado anterior)
           ([1, 0, 1, 1], [0, 1, 1, 1], [0, 1, 1, 1, 0, 1, 0, 0])
       """
-      
-      # si hacemos range(m*2*n + 100) x=x[101:]
-      #y=y[101:]
-      #z=z[101:]
       x_hat=[]
       y_hat=[]
       z_hat=[]
       
-      #en la de imagenes multiplicaba solo z por 2, aqui todas *2 mas ya que
-      #la imagen encriptada ocupa el doble que la original
       for k in range(m*n):
          x_hat.append(int((x[k]*10**13)%m))
          y_hat.append(int((y[k]*10**13)%n))
-      for k in range(m*n*2):
+      for k in range(m*n*2): #z_hat vale más pues después se necesitará 
          z_hat.append(int((z[k]*10**13)%2))
-         #de longitud Mx4N
         
       return x_hat,y_hat,z_hat  
 
+
+
 def permutacion(matriz:list,x_hat,y_hat)->list:
     """
-    in: Dada una matriz de bin Mx2N
+    in: Dada una matriz
         
-    out: Devolverá la matriz Mx2N resultante de intercambiar de posición sus celdas
+    out: Devolverá la matriz resultante de intercambiar de posición sus celdas
+         intercambiando la pos M i,j por la M x_hat_i,y_hat_j
     
     Example:
     ----------
@@ -286,170 +436,25 @@ def permutacion(matriz:list,x_hat,y_hat)->list:
     return resultado
 
     
-# -------------------------------------------------------
-# FASE 2 : DIFUSIÓN
-# -------------------------------------------------------
-
-#La tabla correspondiente a la tabla1 
-tabla=[[1,0]]*4+[[0,1]]*2+[[1,0]]*2+[[0,1]]*4+[[1,0]]*4+[[0,1]]*6+[[1,0]]*2+[[0,1]]*2+[[1,0]]*2+[[0,1]]*4
-
-def bitsAltos(matriz:list)->list:
-    """
-    
-    in: Dada una matriz 
-    
-    out: Devuelve la matriz formada por los bits altos
-    
-    Se llama así ya que en nuestro algoritmo se aplica a una matriz Mx2N donde cada columna son los bits
-        altos - bajos alternamente. Al quedarnos solo con los pares nos quedamos con los bits Altos
-   
-    Example
-    --------
-    >>> bitsAltos([[29,42,130],[50,2,220]])
-        [[16, 32, 128], [48, 0, 208]]
-   
-    """
-    matrizAlta=[]
-    m=len(matriz)
-    n=len(matriz[0])
-    mascaraAltos=0b11110000
-    for i in range(m):
-        fila=[]
-        for j in range(n):
-            fila.append(mascaraAltos & matriz[i][j])
-        matrizAlta.append(fila)
-    return matrizAlta
+# ==================================================================================
+# SECCIÓN 3. FASE 2: DIFUSIÓN
+# ==================================================================================
 
 
-
-
-def bitsBajos(matriz:list)->list:
-    """
-    
-    in: Dada una matriz en forma de lista Mx2N
-    
-    out: Devuelve la matriz formada por las columnas impares con cada bit en una col Mx4N
-    
-    Example
-    --------
-    >>> bitsBajos([[29,42,130],[50,2,220]])
-        [[13, 10, 2], [2, 2, 12]]
-   
-    """
-    matrizBaja=[]
-    m=len(matriz)
-    n=len(matriz[0])
-    mascaraBajos=0b00001111
-    for i in range(m):
-        fila=[]
-        for j in range(n):
-            fila.append(mascaraBajos & matriz[i][j])
-        matrizBaja.append(fila)
-    return matrizBaja
-
-
-def separaBits(matriz:list)->list:
-    nueva_matriz=[]
-    m=len(matriz)
-    n=len(matriz[0])
-    masc1=0b1000
-    masc2=0b0100
-    masc3=0b0010
-    masc4=0b0001
-    mascaras=[masc1,masc2,masc3,masc4]
-    for i in range(m):
-        fila=[]
-        for j in range(n):
-            elem=matriz[i][j]
-            if elem>15:
-                elem=elem>>4
-            for k in range(4):
-                if elem & mascaras[k]>0:
-                    fila.append(1)
-                else:
-                    fila.append(0)
-        nueva_matriz.append(fila)
-    return nueva_matriz
-    
-     
-"""
 def tabla1(matriz:list,tiempo:int,Sini:list):
-    
-    
+    """
     in: matriz, tiempo t y un estado inicial Sini con las mismas dimensiones que la matriz
-        Ambas matrices de enteros 
+        Ambas matrices de 0 o 1 
     
-    out: Estado St+1, St resultados tras aplicar t veces la tabla 1 con las reglas locales de nuestro 
+    out: Estados St+1 y St tras aplicar t veces la tabla 1 con las reglas locales de nuestro 
         Autómata Celular Reversible
     
     Example:
     ----------
-    >>> tabla1([[2,14],[3,6]],5,[[4,5],[1,8]])
-        ([[5, 14], [3, 14]], [[2, 8], [5, 12]])
-    
-    
-    #la sini sera z_grro
-    S=[Sini,matriz]
-    m=len(matriz)
-    n=len(matriz[0])
-    masc1=0b1000
-    masc2=0b0100
-    masc3=0b0010
-    masc4=0b0001
-    mascaras=[masc1,masc2,masc3,masc4]
-    for t in range(1,tiempo):
-        St_nueva=[]
-        for i in range(m):
-            fila_nueva=[]
-            for j in range(n):
-                St=S[t]
-                St_vieja=S[t-1]
-                elem=0b0
-                for k in range(4):
-                    if k==0:
-                        iz=St[i][(j-1)%n] & mascaras[(3-k)]
-                        dcha=St[i][j] &mascaras[k+1]
-                    if k==3:
-                        dcha=St[i][(j+1)%n] & mascaras[3-k]
-                        iz=St[i][j] & mascaras[k-1]
-                    
-                    else:
-                        iz=St[i][(j-1)%n] & mascaras[k-1]
-                        dcha=St[i][j] &mascaras[k+1]
-                    arriba=St[(i-1)%m][j] & mascaras[k]
-                    centro=St[i][j] & mascaras[k]
-                    abajo=St[(i+1)%m][j] & mascaras[k]
-                    
-                    valores=[iz,arriba,centro,abajo,dcha]
-                    binario=""
-                    for v in valores:
-                        if v>0:
-                            binario+="1"
-                        else:
-                            binario+="0"
-                    
-                    #pasamos el num a binario para acceder a su valor en la tabla
-                    pos=int(binario,2) #pasamos a int
-                
-    #Como la tabla 1 guarda segun la combinación de un posible valor segun Sij^(t-1) valga 0 o 1
-                    ind=0
-                    if St_vieja[i][j] & mascaras[k] ==0:
-                        ind=0
-                    else:
-                        ind=1
-                    dato_nuevo=tabla[pos][ind]
-                    elem=elem | (dato_nuevo<<(3-k))
-                        
-                fila_nueva.append(elem)
-            St_nueva.append(fila_nueva)
-        S.append(St_nueva)
-    #Para poder descifrar después vamos a guardar ambos
-    return S[-1],S[-2]
-
-
-"""
-
-def tabla1(matriz:list,tiempo:int,Sini:list):
+    >>> tabla1([[0, 0, 1, 0, 1, 1, 1, 0], [0, 0, 1, 1, 0, 1, 1, 0]] , 6 , [[0, 1, 0, 0, 0, 1, 0, 1], [0, 0, 0, 1, 1, 0, 0, 0]])
+        ([[0, 0, 1, 0, 0, 1, 1, 0], [1, 0, 1, 1, 1, 0, 0, 0]],
+         [[0, 1, 0, 1, 0, 0, 1, 0], [0, 0, 1, 1, 0, 1, 0, 1]])
+    """
     S=[Sini,matriz]
     m=len(matriz)
     n=len(matriz[0])
@@ -468,45 +473,21 @@ def tabla1(matriz:list,tiempo:int,Sini:list):
                 
                 pos=(iz << 4) | (arriba << 3) | (centro << 2) | (abajo << 1) | dcha
                 
-    #Como la tabla 1 guarda segun la combinación de un posible valor segun Sij^(t-1) valga 0 o 1
-                ind=St_vieja[i][j]
+                ind = St_vieja[i][j]
                 fila_nueva.append(tabla[pos][ind])
             St_nueva.append(fila_nueva)
         S.append(St_nueva)
+        
     #Para poder descifrar después vamos a guardar ambos
     return S[-1],S[-2]
-
-def union4BitsAltos(matriz:list)->list:
-    m=len(matriz)
-    n=len(matriz[0])
-    nueva_matriz=[]
-    for i in range(m):
-        fila=[]
-        for j in range(0,n,4):
-            elem=matriz[i][j]<<3 | matriz[i][j+1] <<2 |matriz[i][j+2]<<1 | matriz[i][j+3]
-            fila.append(elem<<4)
-        nueva_matriz.append(fila)
-    return nueva_matriz
-
-def union4BitsBajos(matriz:list)->list:
-    m=len(matriz)
-    n=len(matriz[0])
-    nueva_matriz=[]
-    for i in range(m):
-        fila=[]
-        for j in range(0,n,4):
-            elem=matriz[i][j]<<3 | matriz[i][j+1] <<2 |matriz[i][j+2]<<1 | matriz[i][j+3]
-            fila.append(elem)
-        nueva_matriz.append(fila)
-    return nueva_matriz
-    
             
 
 def opFinal(matriz:list,z:list,Cini:int)->list:
     """
-    in: matriz de int, z lista de m*n, Cini entero dado
+    in: matriz de int mxn, z lista de longitud m*n, Cini entero dado
    
-    out: una matriz m*n 
+    out: una matriz mxn resultante de aplicar una fase de difusión final en
+         cascada para garantizar la encriptación de los 4 bits bajos
     
     Example:
     -----------
@@ -529,16 +510,20 @@ def opFinal(matriz:list,z:list,Cini:int)->list:
     return DesAplana(C[1:],m,n)
 
 
-# -------------------------------------------------------
-# RESULTADO
-# -------------------------------------------------------
+# ==================================================================================
+# SECCIÓN 4. FUNCIÓN FINAL DEL ALGORITMO DE ENCRIPTACIÓN DE IMÁGENES
+# ==================================================================================
 
 
-def Fase1y2_2(img:str):
+def Encripta_img(img:str,x0:int,y0:int,z0:int,u:int,k1:int,k2:int,k3:int):
     """
-    in: Dada una imagen, pasado su nombre en str
+    in: Dada una imagen, pasado su nombre en str, y los valores de las claves
         
     out: Devolverá la matriz después de la fase 1 de confusión y la 2 de difusión
+    
+    Example:
+    ---------
+    >>> Encripta_img("p1.png",x0,y0,z0,u,k1,k2,k3)
     
     """
     # FASE 1 
@@ -547,55 +532,55 @@ def Fase1y2_2(img:str):
     matriz = np.array(imagen)
     
     
-
-    
     m2=separa2(matriz) # da la matriz Mx2N
     
     #calculamos los parametros gorro
-    #en la F1 usaremos x e y y en la F2 el z
-    x,y,z=x_y_z(m2)
+    #en la Fase 1 usaremos x e y , en la Fase 2 el z
+    x,y,z=x_y_z(m2,x0,y0,z0,u,k1,k2,k3)
     x_hat,y_hat,z_hat=f_hats(x,y,z,len(m2),len(m2[0]))
     
     m_permutada=permutacion(m2,x_hat,y_hat)
     
     m_juntada=junta2(m_permutada)
+    
+    
     #FASE 2
     #vamos a separar la matriz permutada en los bits altos y los bajos
     mAltos=bitsAltos(m_juntada) 
     mBajos=bitsBajos(m_juntada)
     
-    mAltos_sep=separaBits(mAltos)
+    #separamos en cada bit para poder aplicar la tabla 1
+    mAltos_sep=separaBits(mAltos) 
     mBajos_sep=separaBits(mBajos)
-    #sus elems son str
+    #sus elementos son 0 o 1
     
     # Para obtener el S-1 convertiremos z_hat en matriz
     m_nuevo=len(mAltos)
     n_nuevo=len(mAltos[0])
     S_menos1=Desaplana4(z_hat,m_nuevo,n_nuevo)
     S_menos1_sep=separaBits(S_menos1)
-    #Los elementos de S_menos1 son ints
+    #Los elementos de S_menos1 son 0 o 1
     
     
-    Saltos,Saltos2=tabla1(mAltos_sep,6,S_menos1_sep)
-    Sbajos,Sbajos2=tabla1(mBajos_sep,6,S_menos1_sep)
+    #guardamos los dos ultimos estados para poder desencriptar bien y no perder información 
+    tiempo=6
+    Saltos,Saltos2=tabla1(mAltos_sep,tiempo,S_menos1_sep)
+    Sbajos,Sbajos2=tabla1(mBajos_sep,tiempo,S_menos1_sep)
     
     Saltos_uni=union4BitsAltos(Saltos)
     Saltos2_uni=union4BitsAltos(Saltos2)
     
     Sbajos_uni=union4BitsBajos(Sbajos)
     Sbajos2_uni=union4BitsBajos(Sbajos2)
+    #ahora las 4 matrices unidas son de enteros, agrupando cada 4 bits , no solo de 0 y 1
     
-    #Los elementos de S son ints 
-    
-    #Ahora unimos los bits altos,siendo el valor de St claculado y los bajos
-    #para ello tenemos que volver a agrupar cada 4 bits en una sola celda 
+
     unidos=unionBits(Saltos_uni,Sbajos_uni)
     unidos2=unionBits(Saltos2_uni,Sbajos2_uni)
+    # Para poder desencriptar al completo después, devolveremos una matriz con el doble de filas 
+    # que la original, para poder revertir las operaciones y tener la información suficiente
     
-    #queremos que en lugar de en cada celda un unico bit, tengamos los 8
-    #hemos recuperado las dimensiones originales de la matriz
-    
-    # Hay que añadir una operación extra por si la informacion se encontrarara en los bits inferiores
+    # Hay que añadir una operación extra por si la información se encontrarara en los bits inferiores
     #usaremos Cini=168
     Cini=168
     C=opFinal(unidos,z,Cini)
@@ -611,7 +596,7 @@ def Fase1y2_2(img:str):
                 
                 
 # ==================================================================================
-# SECCIÓN 3. DESENCRIPTACIÓN DE IMÁGENES
+# SECCIÓN 5. DESENCRIPTACIÓN DE IMÁGENES
 # ==================================================================================
         
 def opFinal_inv(matriz:list,z:list,Cini:int)->list:
@@ -646,7 +631,7 @@ def opFinal_inv(matriz:list,z:list,Cini:int)->list:
 
 def tabla1_inv(matriz:list,tiempo:int,Sf:list):
     """
-        La inversa de antes : ESTA DEVUELVE STR
+        La inversa de tabla1
         
     in: matriz, tiempo t y un estado final Sf con las mismas dimensiones que la matriz
         Ambas matrices de enteros 0 o 1
@@ -656,14 +641,12 @@ def tabla1_inv(matriz:list,tiempo:int,Sf:list):
     
     Example:
     ----------
-    >>>tabla1([[1, 0, 1, 1, 1, 0, 1, 1], [1, 0, 0, 1, 1, 0, 1, 0]],5 ,[[1, 1, 1, 0, 1, 1, 1, 0], [1, 0, 0, 1, 0, 1, 0, 0]])
-        ([['1', '0', '1', '0', '1', '1', '0', '0'],
-          ['0', '0', '1', '1', '0', '1', '0', '1']],
-         [['1', '1', '0', '0', '1', '0', '1', '0'],
-          ['0', '1', '0', '1', '0', '0', '1', '1']])
+    >>>tabla1_inv([[1, 0, 1, 1, 1, 0, 1, 1], [1, 0, 0, 1, 1, 0, 1, 0]],5 ,[[1, 1, 1, 0, 1, 1, 1, 0], [1, 0, 0, 1, 0, 1, 0, 0]])
+        ([[1, 0, 1, 0, 1, 1, 0, 0], [0, 0, 1, 1, 0, 1, 0, 1]],
+         [[1, 1, 0, 0, 1, 0, 1, 0], [0, 1, 0, 1, 0, 0, 1, 1]])
     
     """
-    #la sf sera los bits bajos
+    #la sf sera los bits bajos por como encriptamos
     m=len(matriz)
     n=len(matriz[0])
     S=[matriz,Sf]
@@ -695,94 +678,18 @@ def tabla1_inv(matriz:list,tiempo:int,Sf:list):
         S.append(St_nueva)
     return S[-2],S[-1]
 
-"""
-def tabla1_inv(matriz:list,tiempo:int,Sf:list):
-    
-        
-        
-    in: matriz, tiempo t y un estado final Sf con las mismas dimensiones que la matriz
-        Ambas matrices de enteros 
-    
-    out: Estado St+1, St resultados tras aplicar t veces la tabla 1 con las reglas locales de nuestro 
-        Autómata Celular Reversible
-    
-    Example:
-    ----------
-    >>>tabla1([[1, 0, 1, 1, 1, 0, 1, 1], [1, 0, 0, 1, 1, 0, 1, 0]],5 ,[[1, 1, 1, 0, 1, 1, 1, 0], [1, 0, 0, 1, 0, 1, 0, 0]])
-        ([['1', '0', '1', '0', '1', '1', '0', '0'],
-          ['0', '0', '1', '1', '0', '1', '0', '1']],
-         [['1', '1', '0', '0', '1', '0', '1', '0'],
-          ['0', '1', '0', '1', '0', '0', '1', '1']])
-    
-    #la sf sera los bits bajos
-    m=len(matriz)
-    n=len(matriz[0])
-    S=[matriz,Sf]
-    masc1=0b1000
-    masc2=0b0100
-    masc3=0b0010
-    masc4=0b0001
-    mascaras=[masc1,masc2,masc3,masc4]
-    for t in range(1,tiempo):
-        St_nueva=[]
-        for i in range(m):
-            fila_nueva=[]
-            for j in range(n):
-                St_fut=S[t-1]
-                St_pre=S[t]
-                elem=0b0
-                for k in range(4):
-                    if k==0:
-                        iz=St_pre[i][(j-1)%n] & mascaras[k]
-                        dcha=St_pre[i][(j)%n] & mascaras[k]
-                    if k==3:
-                        dcha=St_pre[i][(j+1)%n] & mascaras[k]
-                        iz=St_pre[i][(j)%n] & mascaras[k]
-                    
-                    
-                    arriba=St_pre[(i-1)%m][j] & mascaras[k]
-                    centro=St_pre[i][j] & mascaras[k]
-                    abajo=St_pre[(i+1)%m][j] & mascaras[k]
-                    
-                    valores=[iz,arriba,centro,abajo,dcha]
-                    binario=""
-                    for v in valores:
-                        if v>0:
-                            binario+="1"
-                        else:
-                            binario+="0"
-                    
-                    #pasamos el num a binario para acceder a su valor en la tabla
-                    pos=int(binario,2) #pasamos a int
-                
-    
-                    ind=0
-                    if (St_fut[i][j] & mascaras[k] ==0)  and tabla[pos][0]==0:
-                        ind=0
-                    else:
-                        ind=1
-                    if ind>0: 
-                        elem =  elem | (0b1<<(3-k))
-                    else:
-                        elem =  elem | (0b0<<(3-k))
-                fila_nueva.append(elem)
-            St_nueva.append(fila_nueva)
-        S.append(St_nueva)
-    return S[-2],S[-1]
-
-"""
 
 def permutacion_inv(matriz:list,x_hat,y_hat)->list:
     """
-        La permutacion inversa (ceo que esta funcion no hace falta pues la propia permutación es su propia inversa)
-    in: Dada una matriz de bin Mx2N
+        La permutacion inversa 
+    in: Dada una matriz
         
-    out: Devolverá la matriz Mx2N resultante de intercambiar de posicion sus celdas
+    out: Devolverá la matriz resultante de intercambiar de posición sus celdas
 
     Example:
     ----------
-    >> permutacion_inv([['1100', '1010'], ['0101', '0011']],[1,1,0,0],[1,0,0,1])
-        [['1010', '1100'], ['0011', '0101']]
+    >> permutacion_inv([[2, 6, 7], [2, 8, 4]],[0,1,1,0,0,1],[2,1,0,2,2,1])
+        [[4, 7, 2], [2, 6, 8]]
    
     """
     
@@ -802,6 +709,20 @@ def permutacion_inv(matriz:list,x_hat,y_hat)->list:
 
 
 def copia_matriz(matriz)->list:
+    """
+    in : dada una matriz (en nuestro caso un array de la imagen )
+    
+    out : una matriz (lista de listas) copia de la dada
+    
+    Example:
+    ---------
+    m=array([[140, 139, 139, ...,  96,  95,  96],
+        [125, 124, 125, ...,  83,  83,  83]], dtype=uint8)
+    
+    >>> copia_matriz(m)
+        ([[140, 139, 139, ..., 96, 95, 96],[125, 124, 125, ..., 83, 83, 83]])
+    """
+    
     nueva=[]
     for i in range(len(matriz)):
         fila=[]
@@ -810,9 +731,9 @@ def copia_matriz(matriz)->list:
         nueva.append(fila)
     return nueva
 
-def desEncripta_img(img:str):
+def desEncripta_img(img:str,x0,y0,z0,u,k1,k2,k3):
     """
-    in : nombre de la matriz en str
+    in : nombre de la matriz en str y los valores correctos de la clave
     
     out : devuelve la imagen desencriptada
     
@@ -822,7 +743,7 @@ def desEncripta_img(img:str):
     #añadimos el convert("L") para que sea en escala de grises
     matriz = np.array(imagen)
     
-    matriz2=copia_matriz(matriz) # no del tipo img
+    matriz2=copia_matriz(matriz) # no del tipo (array dtype=uint8)
     
     m=len(matriz2)
     
@@ -832,18 +753,12 @@ def desEncripta_img(img:str):
     
     m2=separa2(mini)
     
-    x,y,z=x_y_z(m2)
+    x,y,z=x_y_z(m2,x0,y0,z0,u,k1,k2,k3)
     x_hat,y_hat,z_hat=f_hats(x,y,z,len(m2),len(m2[0]))
-    
-    
     
     P1=opFinal_inv(mini,z,168)
     P2=opFinal_inv(mini2,z,168)
     
-    #P=unidos de antes
-    
-    #P_sep=separa2(P1)
-    #P_sep2=separa2(P2)
     
     mAltos=bitsAltos(P1) 
     mBajos=bitsBajos(P1) 
@@ -868,14 +783,13 @@ def desEncripta_img(img:str):
     S0baj_uni=union4BitsBajos(S0baj)
     
     unidos=unionBits(S0alt_uni,S0baj_uni)
-    # igual que la m_juntada
+ 
    
     unidos2=separa2(unidos)
 
     
     mp=permutacion_inv(unidos2,x_hat,y_hat)  
     
-    #ahora hay que juntar
     mpJuntas=junta2(mp)
     
     mfinal=np.array(mpJuntas).astype(np.uint8)
