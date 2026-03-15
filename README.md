@@ -31,8 +31,10 @@ Se parte de una imagen inicial.
 3. En la Confusión, a través de un mapa caótico, se permutan los elementos de la matriz.
 4. En la fase de Difusión, la matriz se modifica siguiendo la tabla de reglas locales, que consideran los vecinos de cada célula y su estado anterior para poder asegurar su reversibilidad:
    #### Reglas Locales del Autómata Reversible (RCA)
-     ![Reglas Locales del RCA](reglas_automata.png)
-5. Finalmente se realiza una operación auxiliar:
+   
+     ![Reglas Locales del RCA](tabla1_reglasACR.png)
+   
+6. Finalmente se realiza una operación auxiliar:
    $$c_i = c_{i-1} \oplus p'_i \oplus \text{mod}(\lfloor z_i \cdot 10^{13} \rfloor, 256)$$ .
 
 Este proyecto busca encriptar imágenes , usando algoritmos basados en el siguiente artículo:
