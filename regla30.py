@@ -5,125 +5,91 @@ Created on Fri Mar  6 15:19:56 2026
 @author: Irene
 """
 
+
 # ==================================================================================
-# SECCIÓN 1. ENCRIPTACIÓN DE MENSAJES
+#   ENCRIPTACIÓN DE MENSAJES
 # ==================================================================================
 
-def bin_8(n:int)->str:
-    """
-    in: n es un entero
-        
-    out: Devolverá el número pasado a binario con 8 digitos en forma de str
 
-    Example
-    ------
-    >>> bin_8(97)
-    '01100001'
+#-----------------------------------------------------------------------------------
+#   Operaciones auxiliares
+#-----------------------------------------------------------------------------------
+
+def junta_bits(lista:list):
+    """
     
-    """
-   
-    return f"{n:08b}"
-
-
-def bin_a_num(binario:str)->int:
-    """
-    in: n es un numero de 8 digitos en binario pasado como str
-        
-    out: Devolverá el entero asociado
-
-    Example
-    ------
-    >>> bin_a_num('10110100')
-        180
+    in: lista de 8 elementos, 0 o 1, cada uno indica un byte
     
+    out: Devuelve el entero asociado a juntar los 8 bits 
+    
+    Example:
+    ----------
+    >>> junta_bits([0,1,1,1,0,1,0,1])
+        117   (bin(117)='0b1110101')
+        
     """
-    result=0
-    n=len(binario)
+    elem=0b0
+    n=len(lista)
     for i in range(n):
-        if int(binario[i])==1:
-            result+=2**(n-1-i)
+        elem=lista[i]<<(n-i-1) | elem
+    return elem
+
+
+def separaBits(num:int)->list:
+    """
+    
+    in  : Dado un número entero
+    
+    out : Devuelve una lista de 8 elementos con cada bit del número
+        
+    Example:
+    ---------
+    >>> separaBits(117)
+        [0, 1, 1, 1, 0, 1, 0, 1]
+    
+    """
+    result=[]
+    n=len(bin(num))-2
+    mascaras=[2**i for i in range(n)]
+    for masc in mascaras:
+        elem=num & masc
+        if elem>0:
+            result.append(1)
+        else: 
+            result.append(0)
+    
+    result.reverse()
+    while len(result)<8:
+        result=[0]+result
     return result
 
-def bin_a_str(n:str)->str: 
+def separaBitsPal(palabra:str)->list:
     """
-    in: n es un numero de 8 digitos en binario pasado como str
-        
-    out: Devolverá el caracter asociado a ese numero entero según el código ASCII
-
-    Example
-    ------
-    >>> bin_a_str('01100001')
-    'a'
     
-    """
-    result=0
-    for i in range(8):
-        if n[-1]=="1":
-           result+=2**i
-        n=n[:-1]
-   
-    return chr(int(result))
-       
+    in: Dada una palabra 
     
-
-
-def pal_a_bin(pal:str)->str: 
+    out: Devuelve la lista separando cada bit de cada palabra 
+            8 bits o 16 si son caracteres especiales (ñ,á,...)
+    Example:
+    ---------
+    >>> separaBitsPal('España')
+        [0,1,0,0,0,1,0,1, 0,1,1,1,0,0,1,1, 0,1,1,1,0,0,0,0, 0,1,1,0,
+         0,0,0,1, 1,1,0,0,0,0,1,1,1,0,1,1,0,0,0,1, 0,1,1,0,0,0,0,1]
+                  -------------------------------
+                   16 bytes correspondientes a ñ
     """
-    in: pal es una palabra en str
-        
-    out: Devolverá el número binario asociado a cada letra según el código ASCII 
-
-    Example
-    ------
-    >>> pal_a_bin("HOLA")
-    '01001000010011110100110001000001'
-    
-    """
-    result=""
-    for elem in pal:
-        n=ord(elem)
-        binario=bin_8(n)
-        result+=binario
+    result=[]
+    lista_bin=list(palabra.encode('utf-8'))
+    for num in lista_bin:
+        result+=separaBits(num)
     return result
 
-
-def XOR(pal1:str,pal2:str)->str:
+def regla_30(r0:list,it:int)->str:
     """
-    in: pal1 y pal2 son dos palabras en string
-        
-    out: Devolverá una lista con los int correspondientes a aplicar XOR a cada uno de sus elementos
-
-    Example
-    ------
-    >>> XOR("hola","vale")
-         [30, 14, 0, 4]
-    
-    """
-    palabra_xor=bytearray()
-    pal1_bytes=pal1.encode('utf-8')
-    pal2_bytes=pal2.encode('utf-8')
-    i=len(pal1_bytes)
-    j=len(pal2_bytes)
-    
-    if i>=j:
-        for k in range(0,i):
-            letra_xor=pal1_bytes[k] ^ pal2_bytes[k%j]
-            palabra_xor.append(letra_xor)
-            
-    else:
-        for k in range(0,j):
-            letra_xor=pal1_bytes[k%i] ^ pal2_bytes[k]
-            palabra_xor.append(letra_xor)
-           
-        
-    return list(palabra_xor)
-
-
-def regla_30(it:int)->str:
-    """
-    in: it es un entero que indica el número de iteraciones que se repetirá el proceso 
+    in: r0 es la configuración inicial, it es un entero que indica el número de iteraciones que se repetirá el proceso 
         
     out: Devolverá un número binario en string resultante de aplicarle it veces el algoritmo
+         e ir almacenando el elemento del medio
 
     Consideramos configuración circular, cuando estamos en los extremos se tiene que 
       el vecino izq del primer elemento es el último elemento y el vecino derecho del
@@ -131,35 +97,38 @@ def regla_30(it:int)->str:
       
     Example
     ------
-    >>>regla_30(20)
-    '00000000000010001000100000001000100010000000100010001000000000000'
+    r0=[0]*12+[1]+[0]*12
+    >>> regla_30(r0,20)
+        [1, 0, 1, 1, 1, 0, 0, 1, 1, 0, 0, 0, 1, 0, 1, 1, 0, 0, 1, 0]
     
     """
-    #configuración inicial
-    r0=[0]*12+[1]+[0]*12
-    r0=0b0000000000001000000000000
-    r1=r0.copy()
-    for j in range(it):
-        m=len(r0)
+    #configuración inicial del ejemplo
+    #r0=0b0000000000001000000000000 
+    
+    rs=[r0]
+    result=[]
+    medio=len(r0)//2
+    for j in range(1,it+1):
+        r_nueva=[]
+        r_ant=rs[j-1]
+        
+        m=len(r_ant)
         for i in range(m):
-            if i==m-1: #si estamos en la ultima pos, consideramos su vecina dcha como la primera
-                nueva_dcha=(r0[i-1]+r0[i]+r0[0])%2
-            #cuando estamos en la primera, consideramos la vecina izq como el ultimo elemento 
-            elif i==0:
-                nueva_izda=r1[i]=(r0[-1]+r0[i]+r0[i+1]**2)%2
-            else:
-                r1[i]=(r0[i-1]+r0[i]+r0[i+1]**2)%2
-        r1=[nueva_izda]+r1
-        r1.append(nueva_dcha)
-        r0=r1.copy()   
-        #para que devuelva un str
-        resultado=""
-        for elem in r0:
-            resultado+=str(elem)
+            izq = r_ant[(i-1)%m] 
+            centro = r_ant[i]
+            der = r_ant[(i+1)%m] 
+            r_nueva.append(izq ^ (centro | der))
+       
+        rs.append(r_nueva)
+        result.append(r_nueva[medio])
             
-    return resultado
+    return result
 
-def encripta(pal: str, it: int) -> str:
+
+#-----------------------------------------------------------------------------------
+#   Ejemplo como el del artículo, sin usar sistema hexadecimal
+#-----------------------------------------------------------------------------------
+def encripta_articulo(pal: str,clave_inicial:list, it: int) -> str:
     """
     in: pal es un str , que será la palabra/frase que queramos encriptar
         it es un entero que será el número de iteraciones que usaremos.
@@ -170,45 +139,118 @@ def encripta(pal: str, it: int) -> str:
 
     Example
     ------
-    >>> encripta('adiós muy buenas',230)
-    'anKss*Oõy buedCó'
+    r0=[0]*12+[1]+[0]*12
+    >>> encripta_articulo('SECRETO',r0,100)
+        'êÎdï?Å?'
+        
+    >>> encripta_articulo('María es Española',r0,200)
+        'ôêU~×ðP(\x81i?\x96>\x96\x0f\x1b\x8d\x85×'
+    """
     
-    >>> encripta("Hola buenas, Soy María y me gustaría decirte un par de cosas, en Primer lugar soy ESPAÑOLA, no hay duda de eso",1000)
-     'Hgdi j}mnas, [gq Eizía y em(g}{|aría lmkiz|m un piz(dm(kosas,(mf Xzamer l}oir({gy ESPIÙGLI$(no haq(luli(de esg'
+    clave=regla_30(clave_inicial,it)
+    pal_bin=separaBitsPal(pal)
+    
+    result=[]
+    for i in range(len(pal_bin)):
+        result.append(clave[i] ^ pal_bin[i])
+
+    palabra_encriptada=''
+    for j in range(0,len(result),8):
+        entero=junta_bits(result[j:j+8])
+        palabra_encriptada+=chr(entero)
+      
+    return palabra_encriptada
+
+
+
+#-----------------------------------------------------------------------------------
+#   Encriptado y desEncriptado usando sistema hexadecimal
+#-----------------------------------------------------------------------------------
+def encripta(pal: str,clave_inicial:list, it: int) -> str:
+    """
+    in: Pal es un str , que será la palabra/frase que queramos encriptar.
+        Clave_inicial es el estado inicial del que partirá la regla_30
+        it es un entero que será el número de iteraciones que usaremos.
+        Tenemos que asegurarnos que el numero de it sea lo suficientemente grande 
+        para cubrir la longitud de la palabra/ frase que queramos encriptar
+        
+    out: Devolverá la palabra encriptada en sistema hexadecimal
+
+    Example
+    ------
+    r0=[0]*12+[1]+[0]*12
+    >>> encripta('María es Española',r0,200)
+        'f4ea557ed7f0502881693f963e960f1b8d85d7'
    
     """
-    k=regla_30(it)
-    palbin=pal_a_bin(pal)
-    m=len(palbin)
-    k=k[:m]
-    suma=suma_k(palbin,k)
-    letras= m//8
-    resultado=""
-    for i in range(letras):
-        ind_0=8*i
-        ind_f=8*(i+1)
-        pal_trad=suma[ind_0:ind_f]
-        traduc=bin_a_str(str(pal_trad))
-        resultado+=traduc
-    return resultado
+    clave=regla_30(clave_inicial,it)
+    
+    pal_bin=separaBitsPal(pal)
+    
+    result=[]
+    for i in range(len(pal_bin)):
+        result.append(clave[i] ^ pal_bin[i])
+   
 
-def desEncripta(pal:str,it:int)->str:
+    bytes_encriptados=bytearray()
+    for j in range(0,len(result),8):
+        entero=junta_bits(result[j:j+8])
+        bytes_encriptados.append(entero)
+     
+    
+    return bytes_encriptados.hex()
+
+
+
+def desEncripta(pal:str,clave_inicial:list,it:int)->str:
     """
-    in: pal es un str , que será la palabra/frase que queramos desencriptar
-        it es un entero que será el número de iteraciones que usaremos
+    in: Pal es un str en hexadecimal , que será la palabra/frase que queramos desencriptar.
+        Clave_inicial es el estado inicial del que parterá la regla_30.
+            (tiene que ser la misma que se usó al encriptar)
+        It es un entero que será el número de iteraciones que usaremos 
         
     out: Devolverá la palabra desencriptada en forma de str
 
     Example
     ------
-    >>> desEncripta('anKss*Oõy buedCó',230)
-    'adiós muy buenas'
+    r0=[0]*12+[1]+[0]*12
+    r02=[0]*12 + [1]+[1]+[0]*11
     
-    >>> desEncripta('Hgdi j}mnas, [gq Eizía y em(g}{|aría lmkiz|m un piz(dm(kosas,(mf Xzamer l}oir({gy ESPIÙGLI$(no haq(luli(de esg',1000)
-     'Hola buenas, Soy María y me gustaría decirte un par de cosas, en Primer lugar soy ESPAÑOLA, no hay duda de eso'
+    >>> desEncripta('f4ea557ed7f0502881693f963e960f1b8d85d7',r0,200)
+        'María es Española'
+        
+    si metemos una clave inicial diferente a la que se usó all encriptar:
+        
+    >>> desEncripta('f4ea557ed7f0502881693f963e960f1b8d85d7',r02,200)
+        'Mas���\x1e\x08�c\x06\x07Ճ���̉'
     """
-    result=encripta(pal,it)
-    return result
+    bytes_unidos=bytes.fromhex(pal)
+    enteros_sep=[]
+    for elem in bytes_unidos:
+        enteros_sep+=separaBits(elem)
+    
+    #así hemos recuperado los enteros
+    
+    clave=regla_30(clave_inicial,it)
+    
+    result=[]
+    for i in range(len(enteros_sep)):
+        result.append(clave[i] ^ enteros_sep[i])
+   
 
+    bytes_desencriptados=bytearray()
+    for j in range(0,len(result),8):
+        entero=junta_bits(result[j:j+8])
+        bytes_desencriptados.append(entero)
+    #en este punto tendríamos algo como por ejemplo
+    # bytearray(b'Mar\xc3\xada es Espa\xc3\xb1ola')
+    
+    
+    # Usamos errors='replace' para que ponga el símbolo  cuando el byte sea inválido
+    # para que si cambiamos la clave inicial nos devuelva un mensaje y no un error
+    return bytes_desencriptados.decode('utf-8', errors='replace')
+    
+     
+    
 
 
