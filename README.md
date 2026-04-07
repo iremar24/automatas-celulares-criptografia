@@ -52,6 +52,7 @@ Este proyecto busca encriptar imágenes , usando algoritmos basados en el siguie
 4. En el caso de las imágenes:
      Se debe ejecutar el script regla30.py e introducir el nombre de la imágen que se desee encriptar. Esta tiene que estar en la misma ubicación que el programa.      Ej: encripta_img $$("p1.png", x_0, y_0, z_0, u, k_1, k_2, k_3,t)$$
 5. Para poder desencriptar, ejecutar el archivo imagenes.py y ejecutar la encriptación, guardar el resultado y a continuación, hacer                                  desEncripta_img $$("resultado.png",x0,y0,z0,u,k1,k2,k3,t)$$, usando los mismos parámetros que al encriptar.
+
 En el archivo de encriptacion de imagenes, se han inicializado unos datos, por lo que bastaría poner sus letras.
 
 
