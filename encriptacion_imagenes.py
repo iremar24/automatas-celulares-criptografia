@@ -11,6 +11,7 @@ from PIL import Image
 from math import sin 
 
 
+
 # ==================================================================================
 # SECCIÓN 0. VALORES INICIALES
 # ==================================================================================
@@ -34,11 +35,15 @@ k3= 36.1    #|k3|> 35.7
 
 t=6
 
+Cini=168
+
+# Estos parámetros se han elegido así para coincidir con el artículo seguido
+
 # -------------------------------------------------------
 #  TABLA NECESARIA PARA FASE 2
 # -------------------------------------------------------
 
-#La tabla correspondiente a la tabla1 
+# La tabla correspondiente a la tabla1 
 tabla=[[1,0]]*4+[[0,1]]*2+[[1,0]]*2+[[0,1]]*4+[[1,0]]*4+[[0,1]]*6+[[1,0]]*2+[[0,1]]*2+[[1,0]]*2+[[0,1]]*4
 
 
@@ -47,17 +52,17 @@ tabla=[[1,0]]*4+[[0,1]]*2+[[1,0]]*2+[[0,1]]*4+[[1,0]]*4+[[0,1]]*6+[[1,0]]*2+[[0,
 # ==================================================================================
 
 
-def Desaplana4(lista:np.ndarray,m:int,n:int)->np.ndarray:
+def desaplana4(lista:np.ndarray,m:int,n:int)->np.ndarray:
     """
     
-    in : lista de 0 y 1 con longitud un múltiplo de 4 ,m y n ints
+    in : Lista de 0 y 1 con longitud un múltiplo de 4 ,m y n ints
     
-    out: matriz de mxn donde cada elemento es el entero asociado a cada pack de 4 bits
+    out: Matriz de mxn donde cada elemento es el entero asociado a cada pack de 4 bits
     
     
     Example:
     ----------
-    >>> Desaplana4(np.array([0,1,1,0,1,0,1,1,1,0,1,0,0,0,1,1]),2,2) 
+    >>> desaplana4(np.array([0,1,1,0,1,0,1,1,1,0,1,0,0,0,1,1]),2,2) 
         array([[ 6, 11], [10,  3]], dtype=int32)
     """
     elems3=lista[0::4]<<3
@@ -71,10 +76,10 @@ def Desaplana4(lista:np.ndarray,m:int,n:int)->np.ndarray:
 def unionBits(altos:np.ndarray,bajos:np.ndarray)->np.ndarray:
     """
     
-    in : Dos matrices
+    in : Dos matrices con la misma dimensión
     
     out: Unión de las dos matrices , siendo cada elemento la union de los 4 bits de la primera
-    como superiores mas los 4 bits de la segunda como inferiores
+        como superiores más los 4 bits de la segunda como inferiores
     
     Example: 
     ----------
@@ -89,9 +94,9 @@ def unionBits(altos:np.ndarray,bajos:np.ndarray)->np.ndarray:
 def union4BitsAltos(matriz:np.ndarray)->np.ndarray:
     """
     
-    in : matriz Mx4N con elementos int 0 o 1 
+    in : Matriz Mx4N con elementos int 0 o 1 
     
-    out : matriz MxN resultante de agrupar cada 4 bits tomándolos como los 4 bits altos
+    out : Matriz MxN resultante de agrupar cada 4 bits tomándolos como los 4 bits altos
     
     Example:
     ----------
@@ -110,9 +115,9 @@ def union4BitsAltos(matriz:np.ndarray)->np.ndarray:
 def union4BitsBajos(matriz:np.ndarray)->np.ndarray:
     """
     
-    in : matriz Mx4N con elementos int 0 o 1 
+    in : Matriz Mx4N con elementos int 0 o 1 
     
-    out : matriz MxN resultante de agrupar cada 4 bits tomándolos como los 4 bits bajos
+    out : Matriz MxN resultante de agrupar cada 4 bits tomándolos como los 4 bits bajos
     
     Example:
     ----------
@@ -131,9 +136,9 @@ def union4BitsBajos(matriz:np.ndarray)->np.ndarray:
 def bitsAltos(matriz:np.ndarray)->np.ndarray:
     """
     
-    in: Dada una matriz 
+    in: Matriz 
     
-    out: Devuelve la matriz formada por los bits altos
+    out: Matriz formada por los bits altos
     
    
     Example
@@ -150,12 +155,12 @@ def bitsAltos(matriz:np.ndarray)->np.ndarray:
 
 
 
-def bitsBajos(matriz:list)->list:
+def bitsBajos(matriz:np.ndarray)->np.ndarray:
     """
     
-    in: Dada una matriz 
+    in: Matriz 
     
-    out: Devuelve la matriz formada por los bits bajos
+    out: Matriz formada por los bits bajos
     
     Example
     --------
@@ -171,9 +176,9 @@ def bitsBajos(matriz:list)->list:
 def separaBits(matriz:np.ndarray)->np.ndarray:
     """
     
-    in  : Dada una matriz MxN donde los elementos solo tienen la parte alta o baja de sus bits
+    in  : Matriz MxN donde los elementos solo tienen la parte alta o baja de sus bits
     
-    out : Devuelve matriz Mx4N con cada bit separado (0 ó 1)
+    out : Matriz Mx4N con cada bit separado (0 ó 1)
         
     Example:
     ---------
@@ -182,26 +187,24 @@ def separaBits(matriz:np.ndarray)->np.ndarray:
     
     """
     m,n=matriz.shape
-    nueva_matriz=np.zeros((m,4*n),dtype=int)
-    masc1=0b1000
-    masc2=0b0100
-    masc3=0b0010
-    masc4=0b0001
+    nueva_matriz=matriz.copy()
     
-
-    mascaras=[masc1,masc2,masc3,masc4]
-    for i in range(m):
-        for j in range(n):
-            elem=matriz[i][j]
-            if elem>15:
-                elem=elem>>4
-            for k in range(4):
-                if elem & mascaras[k]>0:
-                    nueva_matriz[i][4*j+k]=1
-                else:
-                    nueva_matriz[i][4*j+k]=0
-        
-    return nueva_matriz
+    # Si el elmento es mayor de 15 desplazamos
+    nueva_matriz=np.where(nueva_matriz>15,nueva_matriz>>4,nueva_matriz)
+    
+    bit3 = (nueva_matriz & 0b1000) >>3  # Los valores del bit 4 de cada elemento
+    bit2 = (nueva_matriz & 0b0100) >> 2
+    bit1 = (nueva_matriz & 0b0010) >> 1
+    bit0 = (nueva_matriz & 0b0001) 
+    
+    result=np.zeros((m,4*n),dtype=int)
+    result[:,0::4]=bit3
+    result[:,1::4]=bit2
+    result[:,2::4]=bit1
+    result[:,3::4]=bit0
+    
+    
+    return result
     
 
 # ==================================================================================
@@ -210,9 +213,9 @@ def separaBits(matriz:np.ndarray)->np.ndarray:
   
 def separa2(matriz:np.ndarray)->np.ndarray:
      """
-     in: Dada una matriz de bin MxN
+     in: Matriz de bin MxN
          
-     out: Devolverá la matriz Mx2N resultante de separar cada número (8 bits) por la mitad
+     out: Matriz Mx2N resultante de separar cada número (8 bits) por la mitad
           cada mitad estará en una columna distinta
 
      Example
@@ -251,7 +254,7 @@ def junta2(matriz:np.ndarray)->np.ndarray:
     elem1 = matriz[:, 0::2]
     elem2 = matriz[:, 1::2]
     
-    #equivalente al if 
+    # Aseguramos que los de elem1 sean bits altos (>15) y los de elem2 <=15
     elem1 = np.where(elem1 <= 15, elem1 << 4, elem1)
 
     elem2 = np.where(elem2 > 15, elem2 >> 4, elem2)
@@ -260,14 +263,14 @@ def junta2(matriz:np.ndarray)->np.ndarray:
 
     return nueva_matriz
  
-#Para este paso es necesario haber pactado los valores
-#iniciales con el receptor, x0,y0,z0,u,k1,k2 y k3
+# Para este paso es necesario haber pactado los valores
+# iniciales con el receptor, x0,y0,z0,u,k1,k2 y k3
 
 def x_y_z(matriz:np.ndarray,x0:float,y0:float,z0:float,u:float,k1:float,k2:float,k3:float)->tuple[np.ndarray, np.ndarray, np.ndarray]:
     """
-    in: Dada una matriz 
+    in: Matriz 
         
-    out: Devolverá los valores x, y, z asociados al mapa caótico
+    out: Valores x, y, z asociados al mapa caótico
     
     Example:
     ----------
@@ -291,12 +294,18 @@ def x_y_z(matriz:np.ndarray,x0:float,y0:float,z0:float,u:float,k1:float,k2:float
     z=np.zeros(m*n*2+1,dtype=float)
     x[0],y[0],z[0]=x0,y0,z0
    
+    
+    xl,yl,zl=x0,y0,z0
     #creamos el mapa caotico
     for l in range(m*n*2): 
-        x[l+1]=(u*k1*y[l]*(1-x[l])+z[l])%1
-        y[l+1]=(u*k2*y[l]+z[l]*1/(1+(x[l+1])**2))% 1
-        z[l+1]=(u*(x[l+1]+y[l+1] + k3)*sin(z[l]))%1
+        # guardamos las variables para evitar tener que acceder a la matriz
+        xl_sig=(u*k1*yl*(1-xl)+zl)%1
+        yl_sig=(u*k2*yl+zl*1/(1+xl_sig**2))% 1
+        zl_sig=(u*(xl_sig+yl_sig + k3)*sin(zl))%1
         
+        x[l+1],y[l+1],z[l+1]=xl_sig,yl_sig,zl_sig
+        
+        xl,yl,zl==xl_sig,yl_sig,zl_sig
     #vamos desde el uno para no usar los valores x0,y0,z0
     return x[1:],y[1:],z[1:]
 
@@ -306,7 +315,7 @@ def f_hats(x:np.ndarray,y:np.ndarray,z:np.ndarray,m:int,n:int)->tuple[np.ndarray
       """
       in: Dados x,y,z y las dimensiones m,n 
           
-      out: Devolverá los x_gorro,y_gorro y z_gorro discretizando las secuencias del mapa caótico
+      out: x_gorro,y_gorro y z_gorro discretizando las secuencias del mapa caótico
 
       Example:
       ----------
@@ -316,22 +325,23 @@ def f_hats(x:np.ndarray,y:np.ndarray,z:np.ndarray,m:int,n:int)->tuple[np.ndarray
       x_hat=np.zeros(m*n,dtype=int)
       y_hat=np.zeros(m*n,dtype=int)
       z_hat=np.zeros(m*n*2,dtype=int)
-      x=x*10*13
+      
       x_hat[:]=(x[:m*n]*10**13)%m
       y_hat[:]=(y[:m*n]*10**13)%n
-       #z_hat vale más ya que después se necesitará 
-      z_hat[:]=(z[:]*10**13)%2
+       # z_hat tiene mayor longitud ya que después se necesitará 
+      z_hat[:]=(z[:m*n*2]*10**13)%2
         
       return x_hat,y_hat,z_hat  
 
 
 
+
 def permutacion(matriz:np.ndarray,x_hat,y_hat)->np.ndarray:
     """
-    in: Dada una matriz
+    in: Matriz
         
-    out: Devolverá la matriz resultante de intercambiar de posición sus celdas
-         intercambiando la pos M i,j por la M x_hat_i,y_hat_j
+    out: Matriz resultante de intercambiar de posición sus celdas
+         intercambiando la pos i,j por la x_hat_i,y_hat_j de la matriz
     
     Example:
     ----------
@@ -342,17 +352,18 @@ def permutacion(matriz:np.ndarray,x_hat,y_hat)->np.ndarray:
     """
     
     m,n=matriz.shape
-    resultado=matriz
+    resultado=matriz.copy()
     ind_caos=0
     for i in range(m):
-        for j in range(n):
-            nueva_i=x_hat[ind_caos]
-            nueva_j=y_hat[ind_caos]
-            resultado[i,j],resultado[nueva_i,nueva_j]=resultado[nueva_i,nueva_j],resultado[i,j]
-        
-            ind_caos+=1
-    
+          for j in range(n):
+              nueva_i=x_hat[ind_caos]
+              nueva_j=y_hat[ind_caos]
+              resultado[i,j],resultado[nueva_i,nueva_j]=resultado[nueva_i,nueva_j],resultado[i,j]
+          
+              ind_caos+=1
+      
     return resultado
+
 
     
 # ==================================================================================
@@ -362,7 +373,7 @@ def permutacion(matriz:np.ndarray,x_hat,y_hat)->np.ndarray:
 
 def tabla1(matriz:np.ndarray,tiempo:int,Sini:np.ndarray)->tuple[np.ndarray, np.ndarray]:
     """
-    in: matriz, tiempo t y un estado inicial Sini con las mismas dimensiones que la matriz
+    in: Matriz, tiempo t y un estado inicial Sini con las mismas dimensiones que la matriz
         Ambas matrices de 0 o 1 
     
     out: Estados St+1 y St tras aplicar t veces la tabla 1 con las reglas locales de nuestro 
@@ -377,6 +388,9 @@ def tabla1(matriz:np.ndarray,tiempo:int,Sini:np.ndarray)->tuple[np.ndarray, np.n
     m,n=matriz.shape
     S=[Sini,matriz]
 
+    St=matriz
+    St_vieja=Sini
+    
     for t in range(1,tiempo):
         St_nueva=np.zeros((m,n),dtype=int)
         for i in range(m):
@@ -393,18 +407,20 @@ def tabla1(matriz:np.ndarray,tiempo:int,Sini:np.ndarray)->tuple[np.ndarray, np.n
                 
                 ind = St_vieja[i,j]
                 St_nueva[i,j]=tabla[pos][ind]
+        St=St_nueva
         
         S.append(St_nueva)
         
-    #Para poder descifrar después vamos a guardar ambos
+    # Para poder descifrar después vamos a guardar ambos
     return S[-1],S[-2]
             
 
+
 def opFinal(matriz:np.ndarray,z:np.ndarray,Cini:int)->np.ndarray:
     """
-    in: matriz de int mxn, z lista de longitud m*n, Cini entero dado
+    in: Matriz de int mxn, z lista de longitud m*n, Cini entero dado
    
-    out: una matriz mxn resultante de aplicar una fase de difusión final en
+    out: Matriz mxn resultante de aplicar una fase de difusión final en
          cascada para garantizar la encriptación de los 4 bits bajos
     
     Example:
@@ -421,7 +437,7 @@ def opFinal(matriz:np.ndarray,z:np.ndarray,Cini:int)->np.ndarray:
     C=np.zeros(n*m+1,dtype=int)
     C[0]=Cini
     for i in range(n*m):
-        #usamos C[i] para usar el ultimo elem añadido
+        # Usamos C[i] para usar el ultimo elem añadido
         nuevoC=C[i] ^ matriz1D[i] ^ int(z[i]*(10**13))%256
         C[i+1]=nuevoC
         #C tiene m*n+1, descartamos el Cini
@@ -434,11 +450,11 @@ def opFinal(matriz:np.ndarray,z:np.ndarray,Cini:int)->np.ndarray:
 # ==================================================================================
 
 
-def encripta_img(img:str,x0:int,y0:int,z0:int,u:int,k1:int,k2:int,k3:int,tiempo:int):
+def encripta_img(img:str,x0:int,y0:int,z0:int,u:int,k1:int,k2:int,k3:int,tiempo:int,Cini:int):
     """
-    in: Dada una imagen, pasado su nombre en str, y los valores de las claves
+    in: Imagen pasado su nombre en str y los valores de la clave
         
-    out: Devolverá la matriz después de la fase 1 de confusión y la 2 de difusión
+    out: Matriz después de la fase 1 de confusión y la 2 de difusión
     
     Example:
     ---------
@@ -447,14 +463,14 @@ def encripta_img(img:str,x0:int,y0:int,z0:int,u:int,k1:int,k2:int,k3:int,tiempo:
     """
     # FASE 1 
     imagen=img=Image.open(img).convert("L")
-    #añadimos el convert("L") para que sea en escala de grises
+    # Añadimos el convert("L") para que sea en escala de grises
     matriz = np.array(imagen)
     
     
-    m2=separa2(matriz) # da la matriz Mx2N
+    m2=separa2(matriz) # Da la matriz Mx2N
     
-    #calculamos los parametros gorro
-    #en la Fase 1 usaremos x e y , en la Fase 2 el z
+    # Calculamos los parametros y sus parametros gorro correspondientes
+    # En la Fase 1 usaremos x e y , en la Fase 2 el z
     x,y,z=x_y_z(m2,x0,y0,z0,u,k1,k2,k3)
     x_hat,y_hat,z_hat=f_hats(x,y,z,len(m2),len(m2[0]))
     
@@ -463,24 +479,24 @@ def encripta_img(img:str,x0:int,y0:int,z0:int,u:int,k1:int,k2:int,k3:int,tiempo:
     m_juntada=junta2(m_permutada)
     
     
-    #FASE 2
-    #vamos a separar la matriz permutada en los bits altos y los bajos
+    # FASE 2
+    # Vamos a separar la matriz permutada en los bits altos y los bajos
     mAltos=bitsAltos(m_juntada) 
     mBajos=bitsBajos(m_juntada)
     
-    #separamos en cada bit para poder aplicar la tabla 1
+    # Separamos en cada bit para poder aplicar la tabla 1
     mAltos_sep=separaBits(mAltos) 
     mBajos_sep=separaBits(mBajos)
-    #sus elementos son 0 o 1
+    # Sus elementos son 0 o 1
     
     # Para obtener el S-1 convertiremos z_hat en matriz
     m_nuevo,n_nuevo=mAltos.shape
-    S_menos1=Desaplana4(z_hat,m_nuevo,n_nuevo)
+    S_menos1=desaplana4(z_hat,m_nuevo,n_nuevo)
     S_menos1_sep=separaBits(S_menos1)
-    #Los elementos de S_menos1 son 0 o 1
+    # Los elementos de S_menos1 son 0 o 1
     
     
-    #guardamos los dos ultimos estados para poder desencriptar bien y no perder información 
+    # Guardamos los dos ultimos estados para poder desencriptar bien y no perder información 
     Saltos,Saltos2=tabla1(mAltos_sep,tiempo,S_menos1_sep)
     Sbajos,Sbajos2=tabla1(mBajos_sep,tiempo,S_menos1_sep)
     
@@ -489,7 +505,7 @@ def encripta_img(img:str,x0:int,y0:int,z0:int,u:int,k1:int,k2:int,k3:int,tiempo:
     
     Sbajos_uni=union4BitsBajos(Sbajos)
     Sbajos2_uni=union4BitsBajos(Sbajos2)
-    #ahora las 4 matrices unidas son de enteros, agrupando cada 4 bits , no solo de 0 y 1
+    # Ahora las 4 matrices unidas son de enteros, agrupando cada 4 bits , no solo de 0 y 1
     
 
     unidos=unionBits(Saltos_uni,Sbajos_uni)
@@ -498,14 +514,13 @@ def encripta_img(img:str,x0:int,y0:int,z0:int,u:int,k1:int,k2:int,k3:int,tiempo:
     # que la original, para poder revertir las operaciones y tener la información suficiente
     
     # Hay que añadir una operación extra por si la información se encontrarara en los bits inferiores
-    #usaremos Cini=168
-    Cini=168
+    
     C=opFinal(unidos,z,Cini)
     
     
     C2=opFinal(unidos2,z,Cini)
 
-    Cf = np.vstack((C, C2)) #una encima de la otra
+    Cf = np.vstack((C, C2)) # Una encima de la otra
     
     mfinal=np.array(Cf).astype(np.uint8)
     img_final=Image.fromarray(mfinal)
@@ -515,14 +530,15 @@ def encripta_img(img:str,x0:int,y0:int,z0:int,u:int,k1:int,k2:int,k3:int,tiempo:
 # ==================================================================================
 # SECCIÓN 5. DESENCRIPTACIÓN DE IMÁGENES
 # ==================================================================================
-        
+ 
+      
 def opFinal_inv(matriz:np.ndarray, z:np.ndarray, Cini:int)->np.ndarray:
     """
         La inversa de OpFinal anterior
     
-    in: matriz int, z lista de m*n, Cini entero dado
+    in: Matriz int, z lista de m*n, Cini entero dado
    
-    out: una matriz m*n 
+    out: Matriz m*n 
     
     Example:
     -----------
@@ -548,10 +564,10 @@ def tabla1_inv(matriz:np.ndarray,tiempo:int,Sf:np.ndarray)->np.ndarray:
     """
         La inversa de tabla1
         
-    in: matriz, tiempo t y un estado final Sf con las mismas dimensiones que la matriz
+    in: Matriz, tiempo t y un estado final Sf con las mismas dimensiones que la matriz
         Ambas matrices de enteros 0 o 1
     
-    out: Estado St+1, St resultados tras aplicar t veces la tabla 1 con las reglas locales de nuestro 
+    out: Estados St+1, St resultantes tras aplicar t veces la tabla 1 con las reglas locales de nuestro 
         Autómata Celular Reversible
     
     Example:
@@ -561,7 +577,7 @@ def tabla1_inv(matriz:np.ndarray,tiempo:int,Sf:np.ndarray)->np.ndarray:
          array([[0, 0, 1, 0, 0, 1, 1, 0],[1, 0, 1, 1, 1, 0, 0, 0]]))
     
     """
-    #la sf sera los bits bajos por como encriptamos
+    # Sf sera los bits bajos por como encriptamos
     m,n=matriz.shape
     S=[matriz,Sf]
     for t in range(1,tiempo):
@@ -597,9 +613,10 @@ def tabla1_inv(matriz:np.ndarray,tiempo:int,Sf:np.ndarray)->np.ndarray:
 def permutacion_inv(matriz:list,x_hat,y_hat)->list:
     """
         La permutacion inversa 
-    in: Dada una matriz
         
-    out: Devolverá la matriz resultante de intercambiar de posición sus celdas
+    in: Matriz
+        
+    out: Matriz resultante de intercambiar de posición sus celdas
 
     Example:
     ----------
@@ -622,19 +639,19 @@ def permutacion_inv(matriz:list,x_hat,y_hat)->list:
 
 
 
-def desEncripta_img(img:str,x0:int,y0:int,z0:int,u:int,k1:int,k2:int,k3:int,tiempo:int):
+def desEncripta_img(img:str,x0:int,y0:int,z0:int,u:int,k1:int,k2:int,k3:int,tiempo:int,Cini:int):
     """
-    in : nombre de la matriz en str y los valores correctos de la clave
+    in : Nombre de la matriz en str y los valores correctos de la clave
     
-    out : devuelve la imagen desencriptada
+    out : Imagen desencriptada
     
     Example:
     ---------
     >>> desEncripta_img("p1_encriptada.png",x0,y0,z0,u,k1,k2,k3,6)
     """
-    #Proceso inverso
+    # Proceso inverso
     imagen=img=Image.open(img).convert("L")
-    #añadimos el convert("L") para que sea en escala de grises
+    # Añadimos el convert("L") para que sea en escala de grises
     matriz = np.array(imagen)
     
 
@@ -643,22 +660,22 @@ def desEncripta_img(img:str,x0:int,y0:int,z0:int,u:int,k1:int,k2:int,k3:int,tiem
     
     mini=matriz[:m//2,:]
     mini2=matriz[m//2:,:]
-    #mini1==C y mini2==C2 de antes
+    # mini1==C y mini2==C2 de antes
     
     m2=separa2(mini)
     
     x,y,z=x_y_z(m2,x0,y0,z0,u,k1,k2,k3)
     x_hat,y_hat,z_hat=f_hats(x,y,z,len(m2),len(m2[0]))
     
-    P1=opFinal_inv(mini,z,168)
-    P2=opFinal_inv(mini2,z,168)
+    P1=opFinal_inv(mini,z,Cini)
+    P2=opFinal_inv(mini2,z,Cini)
     
     
     mAltos=bitsAltos(P1) 
     mBajos=bitsBajos(P1) 
     
-    #los mBajos coinciden con los Sbajos_uni de antes
-    #los mAltos coinciden con los Saltos_uni
+    # Los mBajos coinciden con los Sbajos_uni de antes
+    # Los mAltos coinciden con los Saltos_uni
     
     mAltos2=bitsAltos(P2) 
     mBajos2=bitsBajos(P2) 

@@ -98,6 +98,7 @@ def regla_30(r0:list,it:int)->str:
 # Al ser la operación XOR su propia inversa, la operación de cifrar es también su propia inversa
 # por tanto para descifrar habría que aplicar la operación de cifrar al criptograma recibido, con la misma clave
 # inicial
+
 def encripta(texto: str,clave_inicial:list) -> str:
     """
     in: texto es un str , que será el mensaje a cifrar/descifrar.
