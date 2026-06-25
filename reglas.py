@@ -38,14 +38,14 @@ def reglas_automatas(num:int,pasos:int,celdas:int,v0):
 # ==================================================================================
 
 
-REGLA = 30
+REGLA = 90
 PASOS = 100
 CELDAS = 200
 
-"""
-Para estudiar más a fondo el autómata de la regla 10 para ver su universalidad,
-se ha usado como configuración el vector v0 aleatorio, 200 pasos y 300 celdas
-"""
+
+# Para estudiar más a fondo el autómata de la regla 10 para ver su universalidad,
+# se ha usado como configuración el vector v0 aleatorio, 200 pasos y 300 celdas
+
 v0_aleatorio = np.random.randint(0, 2, size=CELDAS)
 v0=np.zeros(CELDAS)
 
