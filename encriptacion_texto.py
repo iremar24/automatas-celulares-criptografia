@@ -45,7 +45,7 @@ def separaBitsPal(palabra:str)->list:
 
     """
     result=[]
-    lista_bin=list(palabra.encode('latin-1'))
+    lista_bin=list(palabra.encode('iso8859_15'))
     for num in lista_bin:
         result+=[int(x) for x in f"{num:08b}"]
     return result
@@ -145,4 +145,4 @@ def encripta(texto: str,clave_inicial:list) -> str:
         bytes_encriptados.append(entero)
      
     
-    return bytes_encriptados.decode('latin-1')
+    return bytes_encriptados.decode('iso8859_15')

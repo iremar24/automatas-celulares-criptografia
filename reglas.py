@@ -38,24 +38,26 @@ def reglas_automatas(num:int,pasos:int,celdas:int,v0):
 # ==================================================================================
 
 
-REGLA = 90
-PASOS = 100
-CELDAS = 200
+regla = 30
+pasos = 100
+celdas = 200
+v0=np.zeros(celdas)
+v0[celdas//2]=1
 
 
-# Para estudiar más a fondo el autómata de la regla 10 para ver su universalidad,
+# Para estudiar más a fondo el autómata de la regla 110 para ver su universalidad,
 # se ha usado como configuración el vector v0 aleatorio, 200 pasos y 300 celdas
 
-v0_aleatorio = np.random.randint(0, 2, size=CELDAS)
-v0=np.zeros(CELDAS)
+v0_aleatorio = np.random.randint(0, 2, size=celdas)
 
-v0[CELDAS//2]=1
 
-resultado = reglas_automatas(REGLA, PASOS, CELDAS,v0)
+
+
+resultado = reglas_automatas(regla, pasos, celdas,v0)
 
 plt.figure(figsize=(10, 6))
 plt.imshow(resultado, cmap='binary', interpolation='nearest')
-plt.title(f"Autómata Celular - Regla {REGLA}", fontsize=20)
+plt.title(f"Autómata Celular - Regla {regla}", fontsize=20)
 plt.axis('off')
 plt.show()
 
