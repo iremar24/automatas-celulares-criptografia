@@ -13,8 +13,8 @@ Donde $\oplus$ representa la operación XOR y $\lor$ la operación OR.
 ### Metodología de Encriptación de texto
 Se parte de una secuencia inicial dada. 
 1. Se genera una secuencia binaria a partir de la Regla 30.
-2. Se convierte la palabra introducida por el usuario a binario según la norma latin-9.
-3. Se aplica una operación **XOR** entre el mensaje dado pasado a binario y la secuencia generada por la Regla 30, y se vuelve a pasar a palabra, usando el sistema latin-9 (para evitar problemas con símbolos como 'ñ' o 'à'), para obtener la nueva palabra encriptada.
+2. Se convierte el texto introducido por el usuario a binario según la norma latin-9.
+3. Se aplica una operación **XOR** entre el mensaje dado pasado a binario y la secuencia generada por la Regla 30, y se vuelve a pasar a mensaje legible, usando el sistema latin-9 (para evitar problemas con símbolos como 'ñ' o 'à'), para obtener la nueva palabra encriptada.
 4. Para revertir el proceso, dado el criptograma y la misma clave, se vuelve a aplicar la operación **XOR**, que es su propia inversa y permite recuperar el mensaje original.
 
 Este algoritmo de cifrado de mensajes usando la regla 30 está inspirado en el siguiente artículo:
