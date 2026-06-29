@@ -57,8 +57,9 @@ Se parte de unos parámetros configurables definidos en el código: el número d
 2. Se inicializa el autómata con una configuración inicial $v_0$. Por defecto, un único valor $1$ en el centro y el resto $0$.
 3. En cada iteración se recorren todas las celdas, aplicando unas condiciones de contorno periódicas (ambos extremos están conectados).
 4. Para cada celda se calcula su índice correspondiente a:
-$$I=(c_{i-1}^{(t)} \ll 2) | (c_i^{(t)} \ll 1) | c_{i+1}^{(t)} $$
-5. Dado que el nombre de las reglas viene determinado por el valor decimal obtenido al codificar en binario la secuencia ordenada de los estados resultantes de su función de transición local, evaluando los vecindarios desde $111$ hasta $000$, almacenando el bit más significativo en la posición $0$ de la lista, el nuevo estado se define accediendo a la posición $7-I$ de la regla. 
+ $$I=(c_{i-1}^{(t)} \ll 2) \lor (c_i^{(t)} \ll 1) \lor c_{i+1}^{(t)} $$ 
+siendo $\lor$ la operación $OR$ y $\ll$ la operación de desplazamiento de bits.
+6. Dado que el nombre de las reglas viene determinado por el valor decimal obtenido al codificar en binario la secuencia ordenada de los estados resultantes de su función de transición local, evaluando los vecindarios desde $111$ hasta $000$, almacenando el bit más significativo en la posición $0$ de la lista, el nuevo estado se define accediendo a la posición $7-I$ de la regla. 
 
 
 ## Requisitos previos
