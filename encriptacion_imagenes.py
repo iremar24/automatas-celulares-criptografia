@@ -305,7 +305,7 @@ def x_y_z(matriz:np.ndarray,x0:float,y0:float,z0:float,u:float,k1:float,k2:float
         
         x[l+1],y[l+1],z[l+1]=xl_sig,yl_sig,zl_sig
         
-        xl,yl,zl==xl_sig,yl_sig,zl_sig
+        xl,yl,zl=xl_sig,yl_sig,zl_sig
     #vamos desde el uno para no usar los valores x0,y0,z0
     return x[1:],y[1:],z[1:]
 
